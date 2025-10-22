@@ -24,6 +24,17 @@ namespace Duckov_CashSlot.HarmonyPatches
             ItemSlotCollectionDisplay_Setup.SetupType = ItemSlotCollectionDisplay_Setup.SetupTypes.OnlyKeepCashSlots;
             cashInventoryDisplay.Setup(LevelManager.Instance.MainCharacter.CharacterItem, true);
             ItemSlotCollectionDisplay_Setup.SetupType = ItemSlotCollectionDisplay_Setup.SetupTypes.RemoveCashSlots;
+
+            if (!CheckSuperPetEnabled()) return;
+
+            ModLogger.Log("Super Pet mod detected, adjusting cash slot display.");
+            
+            cashInventoryDisplay.transform.SetSiblingIndex(2);
+        }
+
+        private static bool CheckSuperPetEnabled()
+        {
+            return Harmony.HasAnyPatches("SuperPet");
         }
     }
 }

@@ -34,8 +34,8 @@ namespace Duckov_CashSlot
         public static void Uninitialize()
         {
             if (!IsInitialized) return;
-            IsInitialized = false;
             RemoveLocalization();
+            IsInitialized = false;
 
             ModLogger.Log("CashSlotManager uninitialized.");
         }
@@ -53,6 +53,20 @@ namespace Duckov_CashSlot
             InnerAppendCashSlotToSlotCollection(slotCollection);
         }
 
+        public static bool IsCashSlot(Slot? slot)
+        {
+            if (!IsInitialized)
+            {
+                ModLogger.LogError("CashSlotManager is not initialized!");
+                return false;
+            }
+
+            if (slot != null) return slot.Key == "Cash";
+
+            ModLogger.LogError("Slot is null!");
+            return false;
+        }
+
         public static Slot? FindCashSlotInItem(Item? item)
         {
             if (!IsInitialized)
@@ -68,15 +82,10 @@ namespace Duckov_CashSlot
             }
 
             var slotCollection = item.Slots;
-            if (slotCollection == null)
-            {
-                ModLogger.LogError("Item's slot collection is null!");
-                return null;
-            }
+            if (slotCollection != null) return slotCollection.GetSlot("Cash");
 
-            var cashSlot =
-                slotCollection.list.FirstOrDefault(slot => slot.requireTags.Exists(tag => tag.name == CashTag?.name));
-            return cashSlot ?? null;
+            ModLogger.LogError("Item's slot collection is null!");
+            return null;
         }
 
         private static void SetupLocalization()

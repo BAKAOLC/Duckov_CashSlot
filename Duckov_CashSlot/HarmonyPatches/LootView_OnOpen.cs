@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using Duckov_CashSlot.Enums;
+﻿using Duckov_CashSlot.Enums;
 using Duckov.UI;
 using HarmonyLib;
 using UnityEngine.UI;
@@ -37,10 +36,9 @@ namespace Duckov_CashSlot.HarmonyPatches
 
         private static bool CheckSuperPetEnabled(InventoryDisplay petInventoryDisplay)
         {
-            var field = typeof(InventoryDisplay)
-                .GetField("gridLayoutElement", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (field == null) return false;
-            var layoutElement = field.GetValue(petInventoryDisplay) as LayoutElement;
+            var gridLayoutElementField = AccessTools.Field(typeof(InventoryDisplay), "gridLayoutElement");
+            if (gridLayoutElementField == null) return false;
+            var layoutElement = gridLayoutElementField.GetValue(petInventoryDisplay) as LayoutElement;
             return layoutElement != null && layoutElement.ignoreLayout;
         }
     }

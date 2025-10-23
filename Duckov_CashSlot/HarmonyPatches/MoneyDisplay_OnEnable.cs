@@ -16,7 +16,8 @@ namespace Duckov_CashSlot.HarmonyPatches
     {
         private static readonly Dictionary<MoneyDisplay, Action<Item>> OnSetStackCountCallbacks = [];
 
-        private static readonly Dictionary<MoneyDisplay, Action<Slot>> OnSlotContentChangedCallbacks = [];
+        private static readonly Dictionary<MoneyDisplay, Action<Slot>>
+            OnSlotContentChangedCallbacks = [];
 
         // ReSharper disable once InconsistentNaming
         internal static void Unregister(MoneyDisplay __instance)

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Reflection;
 using Duckov_CashSlot.Enums;
-using Duckov.Utilities;
 using HarmonyLib;
 
 namespace Duckov_CashSlot
@@ -82,18 +80,13 @@ namespace Duckov_CashSlot
             RegisterSlotBySingleTag("Medic", ShowIn.Pet, true);
             RegisterSlotBySingleTag("Key", ShowIn.Pet, true);
 
-            var cashTag = GetTagByName("Cash");
+            var cashTag = TagManager.GetTagByName("Cash");
             if (cashTag != null) SlotManager.RegisterTagLocalization(cashTag, "Item_Cash");
-        }
-
-        private static Tag? GetTagByName(string tagName)
-        {
-            return GameplayDataSettings.Tags.AllTags.FirstOrDefault(t => t.name == tagName);
         }
 
         private static void RegisterSlotBySingleTag(string tagName, ShowIn showIn, bool forbidDeathDrop)
         {
-            var tag = GetTagByName(tagName);
+            var tag = TagManager.GetTagByName(tagName);
             if (tag == null)
             {
                 ModLogger.LogError($"{tagName} tag not found! Cannot register slot.");

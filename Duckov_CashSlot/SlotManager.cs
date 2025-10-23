@@ -11,6 +11,7 @@ namespace Duckov_CashSlot
 {
     public static class SlotManager
     {
+        public const int InventoryIndexBegin = -100000;
         private static readonly Dictionary<Tag, string> TagLocalizationKeys = new();
         private static readonly Dictionary<string, RegisteredSlot> RegisteredSlots = [];
 
@@ -126,6 +127,12 @@ namespace Duckov_CashSlot
             return [];
         }
 
+        public static bool IsRegisteredSlot(Slot slot)
+        {
+            var key = slot.Key;
+            return IsInitialized && RegisteredSlots.ContainsKey(key);
+        }
+
         public static ShowIn GetSlotShowIn(Slot slot)
         {
             var key = slot.Key;
@@ -140,6 +147,31 @@ namespace Duckov_CashSlot
             if (!IsInitialized) return false;
 
             return RegisteredSlots.TryGetValue(key, out var registeredSlot) && registeredSlot.ForbidDeathDrop;
+        }
+
+        public static int GetSlotInventoryIndex(Slot slot)
+        {
+            if (!IsInitialized) return -1;
+
+            var master = slot.Master;
+            if (master == null) return -1;
+
+            var index = master.Slots.list.FindIndex(s => s == slot);
+            if (index < 0) return -1;
+
+            return InventoryIndexBegin - (index + 1);
+        }
+
+        public static Slot? GetSlotByInventoryIndex(Item item, int inventoryIndex)
+        {
+            if (!IsInitialized) return null;
+
+            if (item == null) return null;
+            if (item.Slots == null) return null;
+            if (inventoryIndex >= InventoryIndexBegin) return null;
+
+            var index = InventoryIndexBegin - inventoryIndex - 1;
+            return index >= item.Slots.list.Count ? null : item.Slots.list[index];
         }
 
         public static void RegisterTagLocalization(Tag tag, string localizationKey)

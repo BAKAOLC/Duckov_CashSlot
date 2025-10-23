@@ -1,5 +1,7 @@
-﻿using Duckov.UI;
+﻿using System.Reflection;
+using Duckov.UI;
 using HarmonyLib;
+using UnityEngine.UI;
 
 namespace Duckov_CashSlot.HarmonyPatches
 {
@@ -7,15 +9,13 @@ namespace Duckov_CashSlot.HarmonyPatches
     // ReSharper disable once InconsistentNaming
     internal class LootView_OnOpen
     {
-        // ReSharper disable once InconsistentNaming
-        private static void Postfix(LootView __instance)
+        // ReSharper disable InconsistentNaming
+        private static void Postfix(InventoryDisplay ___petInventoryDisplay)
         {
-            var petInventoryDisplay =
-                __instance.transform.Find("Main/EquipmentAndInventory/Content/InventoryDisplay_Pet");
-            if (petInventoryDisplay == null) return;
+            if (___petInventoryDisplay == null) return;
 
             var cashInventoryDisplayTransform =
-                petInventoryDisplay.transform.Find("CashInventoryDisplay");
+                ___petInventoryDisplay.transform.Find("CashInventoryDisplay");
             if (cashInventoryDisplayTransform == null) return;
 
             ModLogger.Log("Setting up cash slot display in loot view.");
@@ -25,16 +25,21 @@ namespace Duckov_CashSlot.HarmonyPatches
             cashInventoryDisplay.Setup(LevelManager.Instance.MainCharacter.CharacterItem, true);
             ItemSlotCollectionDisplay_Setup.SetupType = ItemSlotCollectionDisplay_Setup.SetupTypes.RemoveCashSlots;
 
-            if (!CheckSuperPetEnabled()) return;
+            if (!CheckSuperPetEnabled(___petInventoryDisplay)) return;
 
             ModLogger.Log("Super Pet mod detected, adjusting cash slot display.");
-            
+
             cashInventoryDisplay.transform.SetSiblingIndex(2);
         }
 
-        private static bool CheckSuperPetEnabled()
+        private static bool CheckSuperPetEnabled(InventoryDisplay petInventoryDisplay)
         {
-            return Harmony.HasAnyPatches("SuperPet");
+            var field = typeof(InventoryDisplay)
+                .GetField("gridLayoutElement", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (field == null) return false;
+            var layoutElement = field.GetValue(petInventoryDisplay) as LayoutElement;
+            return layoutElement != null && layoutElement.ignoreLayout;
         }
     }
+    // ReSharper restore InconsistentNaming
 }

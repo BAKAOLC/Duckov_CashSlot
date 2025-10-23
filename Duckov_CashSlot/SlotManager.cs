@@ -74,12 +74,6 @@ namespace Duckov_CashSlot
 
         public static void ClearRegisteredSlots()
         {
-            if (!IsInitialized)
-            {
-                ModLogger.LogError("SlotManager is not initialized!");
-                return;
-            }
-
             RegisteredSlots.Clear();
             ModLogger.Log("Cleared all registered slots.");
         }

@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Duckov_CashSlot", "Duckov_CashSlot\Duckov_CashSlot.csproj", "{11627EB1-A78D-47EF-8F91-FA8555E76896}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Duckov_ModPreloader", "Duckov_ModPreloader\Duckov_ModPreloader.csproj", "{A3BDB6F2-4A94-4CF0-BDC3-CD17D342AC9C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{11627EB1-A78D-47EF-8F91-FA8555E76896}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11627EB1-A78D-47EF-8F91-FA8555E76896}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11627EB1-A78D-47EF-8F91-FA8555E76896}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3BDB6F2-4A94-4CF0-BDC3-CD17D342AC9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3BDB6F2-4A94-4CF0-BDC3-CD17D342AC9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3BDB6F2-4A94-4CF0-BDC3-CD17D342AC9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3BDB6F2-4A94-4CF0-BDC3-CD17D342AC9C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

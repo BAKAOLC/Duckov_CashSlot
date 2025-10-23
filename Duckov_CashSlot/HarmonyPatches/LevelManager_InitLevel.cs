@@ -8,8 +8,9 @@ namespace Duckov_CashSlot.HarmonyPatches
     {
         private static void Prefix()
         {
-            CashSlotManager.AppendCashSlotToCharacter();
-            ModLogger.Log("Appended cash slot to character definitions.");
+            ModLogger.Log("Applying slot registrations before level initialization...");
+            SlotManager.ApplySlotRegistrations();
+            ModLogger.Log("Applied slot registrations before level initialization.");
         }
     }
 }

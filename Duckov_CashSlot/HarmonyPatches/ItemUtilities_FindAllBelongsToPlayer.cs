@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using HarmonyLib;
 using ItemStatsSystem;
 
@@ -16,14 +17,14 @@ namespace Duckov_CashSlot.HarmonyPatches
             if (mainCharacter == null) return;
 
             var mainCharacterItem = mainCharacter.CharacterItem;
-            var cashSlots = CashSlotManager.FindCashSlotInItem(mainCharacterItem);
-            if (cashSlots == null) return;
+            var registeredSlot = SlotManager.GetAllRegisteredSlotsInItem(mainCharacterItem);
+            if (registeredSlot.Length == 0) return;
 
-            var cashSlotItem = cashSlots.Content;
-            if (cashSlotItem == null) return;
-
-            if (predicate(cashSlotItem))
-                __result.Add(cashSlotItem);
+            var resultItems = registeredSlot.Select(slot => slot.Content)
+                .Where(item => item != null)
+                .Where(item => predicate(item))
+                .ToArray();
+            __result.AddRange(resultItems);
         }
     }
 }

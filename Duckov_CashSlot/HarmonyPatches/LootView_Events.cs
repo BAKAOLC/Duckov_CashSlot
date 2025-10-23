@@ -15,23 +15,25 @@ namespace Duckov_CashSlot.HarmonyPatches
 
         [HarmonyPatch(typeof(LootView), "RegisterEvents")]
         [HarmonyPostfix]
-        // ReSharper disable once InconsistentNaming
-        private static void RegisterEvents_Postfix(LootView __instance)
+        // ReSharper disable InconsistentNaming
+        private static void RegisterEvents_Postfix(LootView __instance, InventoryDisplay ___petInventoryDisplay)
+            // ReSharper restore InconsistentNaming
         {
-            var cashInventoryDisplayTransform =
-                __instance.transform.Find(
-                    "Main/EquipmentAndInventory/Content/InventoryDisplay_Pet/CashInventoryDisplay");
-            if (cashInventoryDisplayTransform == null) return;
+            if (___petInventoryDisplay == null) return;
 
-            var cashInventoryDisplay =
-                cashInventoryDisplayTransform.GetComponent<ItemSlotCollectionDisplay>();
-            if (cashInventoryDisplay == null) return;
+            var petSlotCollectionDisplayTransform =
+                ___petInventoryDisplay.transform.Find("PetSlotCollectionDisplay");
+            if (petSlotCollectionDisplayTransform == null) return;
+
+            var petSlotCollectionDisplay =
+                petSlotCollectionDisplayTransform.GetComponent<ItemSlotCollectionDisplay>();
+            if (petSlotCollectionDisplay == null) return;
 
             var onCharacterSlotItemDoubleClickedMethod = typeof(LootView)
                 .GetMethod("OnCharacterSlotItemDoubleClicked", BindingFlags.NonPublic | BindingFlags.Instance);
             if (onCharacterSlotItemDoubleClickedMethod == null) return;
 
-            cashInventoryDisplay.onElementDoubleClicked += OnElementDoubleClicked;
+            petSlotCollectionDisplay.onElementDoubleClicked += OnElementDoubleClicked;
             LootViewToCashInventoryDisplay[__instance] = OnElementDoubleClicked;
 
             return;
@@ -44,21 +46,27 @@ namespace Duckov_CashSlot.HarmonyPatches
 
         [HarmonyPatch(typeof(LootView), "UnregisterEvents")]
         [HarmonyPostfix]
-        // ReSharper disable once InconsistentNaming
-        private static void UnregisterEvents_Postfix(LootView __instance)
+        // ReSharper disable InconsistentNaming
+        private static void UnregisterEvents_Postfix(LootView __instance, InventoryDisplay ___petInventoryDisplay)
+            // ReSharper restore InconsistentNaming
         {
             if (!LootViewToCashInventoryDisplay.TryGetValue(__instance, out var onElementDoubleClicked)) return;
 
-            var cashInventoryDisplayTransform =
-                __instance.transform.Find(
-                    "Main/EquipmentAndInventory/Content/InventoryDisplay_Pet/CashInventoryDisplay");
-            if (cashInventoryDisplayTransform == null) return;
+            if (___petInventoryDisplay == null)
+            {
+                LootViewToCashInventoryDisplay.Remove(__instance);
+                return;
+            }
 
-            var cashInventoryDisplay =
-                cashInventoryDisplayTransform.GetComponent<ItemSlotCollectionDisplay>();
-            if (cashInventoryDisplay == null) return;
+            var petSlotCollectionDisplayTransform =
+                ___petInventoryDisplay.transform.Find("PetSlotCollectionDisplay");
+            if (petSlotCollectionDisplayTransform == null) return;
 
-            cashInventoryDisplay.onElementDoubleClicked -= onElementDoubleClicked;
+            var petSlotCollectionDisplay =
+                petSlotCollectionDisplayTransform.GetComponent<ItemSlotCollectionDisplay>();
+            if (petSlotCollectionDisplay == null) return;
+
+            petSlotCollectionDisplay.onElementDoubleClicked -= onElementDoubleClicked;
             LootViewToCashInventoryDisplay.Remove(__instance);
         }
     }

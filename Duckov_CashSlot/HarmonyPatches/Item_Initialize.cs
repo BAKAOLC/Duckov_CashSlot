@@ -8,14 +8,13 @@ namespace Duckov_CashSlot.HarmonyPatches
     // ReSharper disable once InconsistentNaming
     internal class Item_Initialize
     {
-        private const int KeyRingTypeID = 836;
         private static Tag? _keyTag;
 
         // ReSharper disable InconsistentNaming
         private static void Postfix(Item __instance)
             // ReSharper restore InconsistentNaming
         {
-            if (__instance.TypeID != KeyRingTypeID) return;
+            if (__instance.TypeID != ModConstant.KeyRingTypeID) return;
 
             _keyTag ??= TagManager.GetTagByName("Key");
             if (_keyTag == null)

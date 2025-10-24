@@ -1,7 +1,9 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 namespace Duckov_CashSlot.Data
 {
+    [Serializable]
     public readonly struct SlotSettings(
         ShowIn showIn = ShowIn.Character,
         bool forbidDeathDrop = false,

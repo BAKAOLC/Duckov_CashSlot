@@ -6,6 +6,9 @@
         {
             SlotManager.Initialize();
             CustomSlotManager.Initialize();
+
+            var cashTag = TagManager.GetTagByName("Cash");
+            if (cashTag != null) SlotManager.RegisterTagLocalization(cashTag, "Item_Cash");
         }
 
         public static void Uninitialize()

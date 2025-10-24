@@ -28,6 +28,9 @@
         <Reference Include="$(DuckovPath)\Duckov_Data\Managed\UniTask.dll">
             <Private>False</Private>
         </Reference>
+        <Reference Include="$(DuckovPath)\Duckov_Data\Managed\Newtonsoft.Json.dll">
+            <Private>False</Private>
+        </Reference>
     </ItemGroup>
 
     <ItemGroup>

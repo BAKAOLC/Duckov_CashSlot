@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using Duckov_CashSlot.Data;
 using Duckov.Utilities;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using UnityEngine;
 
 namespace Duckov_CashSlot
@@ -10,6 +12,14 @@ namespace Duckov_CashSlot
     public static class CustomSlotManager
     {
         private static readonly List<string> RegisteredCustomSlotKeys = [];
+
+        private static readonly JsonSerializerSettings JsonSettings = new()
+        {
+            TypeNameHandling = TypeNameHandling.Auto,
+            Formatting = Formatting.Indented,
+            Converters = [new StringEnumConverter()],
+        };
+
         public static string ConfigBaseDirectory => $"{Application.dataPath}/../ModConfigs/Duckov_CashSlot";
         public static string ConfigFilePath => $"{ConfigBaseDirectory}/CustomSlots.json";
 
@@ -40,40 +50,79 @@ namespace Duckov_CashSlot
 
         private static void LoadConfig()
         {
-            var config = !File.Exists(ConfigFilePath)
-                ? CreateDefaultConfig()
-                : CustomSlotConfig.LoadFromFile(ConfigFilePath);
+            var customSlots = File.Exists(ConfigFilePath)
+                ? LoadConfigFromFile(ConfigFilePath)
+                : CreateDefaultConfig();
 
-            foreach (var customSlot in config.customSlots)
+            foreach (var customSlot in customSlots)
             {
-                if (RegisteredCustomSlotKeys.Contains(customSlot.key))
+                if (RegisteredCustomSlotKeys.Contains(customSlot.Key))
                 {
                     ModLogger.LogWarning(
-                        $"Custom slot with key '{customSlot.key}' is already registered. Skipping duplicate.");
+                        $"Custom slot with key '{customSlot.Key}' is already registered. Skipping duplicate.");
                     continue;
                 }
 
-                SlotManager.RegisterSlot(customSlot.key, GetTagsByNames(customSlot.requiredTags), customSlot.settings);
-                RegisteredCustomSlotKeys.Add(customSlot.key);
-                ModLogger.Log($"Registered custom slot with key '{customSlot.key}'.");
+                SlotManager.RegisterSlot(customSlot.Key, GetTagsByNames(customSlot.RequiredTags), customSlot.Settings);
+                RegisteredCustomSlotKeys.Add(customSlot.Key);
+                ModLogger.Log($"Registered custom slot with key '{customSlot.Key}'.");
             }
         }
 
-        private static CustomSlotConfig CreateDefaultConfig()
+        private static CustomSlot[] CreateDefaultConfig()
         {
             var defaultCustomSlots = new CustomSlot[]
             {
-                new("CustomCashSlot", ["Cash"], new(ShowIn.Pet, true, true)),
-                new("CustomMedicSlot", ["Medic"], new(ShowIn.Pet, true, true)),
-                new("CustomKeySlot", ["Key"], new(ShowIn.Pet, true, true)),
+                new("Cash", ["Cash"], new(ShowIn.Pet, true, true)),
+                new("Medic", ["Medic"], new(ShowIn.Pet, true, true)),
+                new("Key", ["Key"], new(ShowIn.Pet, true, true)),
             };
 
-            var customSlotConfig = new CustomSlotConfig(defaultCustomSlots);
-            customSlotConfig.SaveToFile(ConfigFilePath);
+            try
+            {
+                var json = JsonConvert.SerializeObject(defaultCustomSlots, JsonSettings);
+                File.WriteAllText(ConfigFilePath, json);
+            }
+            catch (IOException e)
+            {
+                ModLogger.LogError($"Failed to create default custom slot configuration file: {e.Message}");
+            }
 
             ModLogger.Log("Created default custom slot configuration.");
 
-            return customSlotConfig;
+            return defaultCustomSlots;
+        }
+
+        private static CustomSlot[] LoadConfigFromFile(string filePath)
+        {
+            try
+            {
+                var json = File.ReadAllText(filePath);
+                var customSlots = JsonConvert.DeserializeObject<CustomSlot[]>(json, JsonSettings);
+
+                if (customSlots == null)
+                {
+                    ModLogger.LogError("Failed to deserialize custom slot configuration. Using empty configuration.");
+                    return [];
+                }
+
+                ModLogger.Log("Loaded custom slot configuration from file.");
+                return customSlots;
+            }
+            catch (IOException e)
+            {
+                ModLogger.LogError($"Failed to read custom slot configuration file: {e.Message}");
+            }
+            catch (JsonException e)
+            {
+                ModLogger.LogError($"Failed to parse custom slot configuration file: {e.Message}");
+            }
+            catch (Exception e)
+            {
+                ModLogger.LogError($"Unexpected error while loading custom slot configuration: {e.Message}");
+            }
+
+            return [];
         }
 
         private static Tag[] GetTagsByNames(string[] tagNames)
@@ -94,47 +143,11 @@ namespace Duckov_CashSlot
             if (!Directory.Exists(ConfigBaseDirectory)) Directory.CreateDirectory(ConfigBaseDirectory);
         }
 
-        [Serializable]
-        private class CustomSlotConfig(CustomSlot[] customSlots)
-        {
-            public CustomSlot[] customSlots = customSlots;
-
-            public void SaveToFile(string filePath)
-            {
-                try
-                {
-                    var json = JsonUtility.ToJson(this, true);
-                    File.WriteAllText(filePath, json);
-                }
-                catch (Exception e)
-                {
-                    ModLogger.LogError($"Failed to save custom slot configuration: {e.Message}");
-                }
-            }
-
-            public static CustomSlotConfig LoadFromFile(string filePath)
-            {
-                if (!File.Exists(filePath)) return new([]);
-
-                try
-                {
-                    var json = File.ReadAllText(filePath);
-                    return JsonUtility.FromJson<CustomSlotConfig>(json) ?? new CustomSlotConfig([]);
-                }
-                catch (Exception e)
-                {
-                    ModLogger.LogError($"Failed to load custom slot configuration: {e.Message}");
-                    return new([]);
-                }
-            }
-        }
-
-        [Serializable]
         private class CustomSlot(string key, string[] requiredTags, SlotSettings settings)
         {
-            public string key = key;
-            public string[] requiredTags = requiredTags;
-            public SlotSettings settings = settings;
+            public string Key { get; } = key;
+            public string[] RequiredTags { get; } = requiredTags;
+            public SlotSettings Settings { get; } = settings;
         }
     }
 }

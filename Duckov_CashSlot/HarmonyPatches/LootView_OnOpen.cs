@@ -26,7 +26,7 @@ namespace Duckov_CashSlot.HarmonyPatches
             ItemSlotCollectionDisplay_Setup.CurrentShowIn = ShowIn.Pet;
             petSlotCollectionDisplay.Setup(LevelManager.Instance.MainCharacter.CharacterItem, true);
             ItemSlotCollectionDisplay_Setup.CurrentShowIn = ShowIn.Character;
-            
+
             ResetGridLayout(petSlotCollectionDisplay);
 
             if (!CheckSuperPetEnabled(___petInventoryDisplay)) return;
@@ -43,12 +43,12 @@ namespace Duckov_CashSlot.HarmonyPatches
             var layoutElement = gridLayoutElementField.GetValue(petInventoryDisplay) as LayoutElement;
             return layoutElement != null && layoutElement.ignoreLayout;
         }
-        
+
         private static void ResetGridLayout(ItemSlotCollectionDisplay slotCollectionDisplay)
         {
             var layoutElement = slotCollectionDisplay.GetComponent<LayoutElement>();
             if (layoutElement == null) return;
-            
+
             layoutElement.preferredHeight = -1;
         }
     }

@@ -1,4 +1,4 @@
-﻿using Duckov_CashSlot.Enums;
+﻿using Duckov_CashSlot.Data;
 
 namespace Duckov_CashSlot
 {
@@ -18,15 +18,16 @@ namespace Duckov_CashSlot
 
         private static void RegisterSlot()
         {
-            RegisterSlotBySingleTag("Cash", ShowIn.Pet, true);
-            RegisterSlotBySingleTag("Medic", ShowIn.Pet, true);
-            RegisterSlotBySingleTag("Key", ShowIn.Pet, true);
+            var slotSettings = new SlotSettings(ShowIn.Pet, true, true);
+            RegisterSlotBySingleTag("Cash", slotSettings);
+            RegisterSlotBySingleTag("Medic", slotSettings);
+            RegisterSlotBySingleTag("Key", slotSettings);
 
             var cashTag = TagManager.GetTagByName("Cash");
             if (cashTag != null) SlotManager.RegisterTagLocalization(cashTag, "Item_Cash");
         }
 
-        private static void RegisterSlotBySingleTag(string tagName, ShowIn showIn, bool forbidDeathDrop)
+        private static void RegisterSlotBySingleTag(string tagName, SlotSettings settings)
         {
             var tag = TagManager.GetTagByName(tagName);
             if (tag == null)
@@ -35,7 +36,7 @@ namespace Duckov_CashSlot
                 return;
             }
 
-            SlotManager.RegisterSlot(tagName, [tag], showIn, forbidDeathDrop);
+            SlotManager.RegisterSlot(tagName, [tag], settings);
         }
     }
 }

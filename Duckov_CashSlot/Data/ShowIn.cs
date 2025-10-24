@@ -1,4 +1,4 @@
-﻿namespace Duckov_CashSlot.Enums
+﻿namespace Duckov_CashSlot.Data
 {
     public enum ShowIn
     {

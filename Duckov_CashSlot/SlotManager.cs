@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Duckov_CashSlot.Enums;
+using Duckov_CashSlot.Data;
 using Duckov.Utilities;
 using ItemStatsSystem;
 using ItemStatsSystem.Items;
@@ -43,8 +43,7 @@ namespace Duckov_CashSlot
             return false;
         }
 
-        public static void RegisterSlot(string key, Tag[] requiredTags,
-            ShowIn showIn = ShowIn.Character, bool forbidDeathDrop = false)
+        public static void RegisterSlot(string key, Tag[] requiredTags, SlotSettings settings)
         {
             if (RegisteredSlots.TryGetValue(key, out _))
             {
@@ -52,12 +51,12 @@ namespace Duckov_CashSlot
                 RegisteredSlots.Remove(key);
             }
 
-            RegisteredSlots.Add(key, new(key, requiredTags, showIn, forbidDeathDrop));
+            RegisteredSlots.Add(key, new(key, requiredTags, settings));
             ModLogger.Log($"""
-                           Registered slot with key '{key}':
-                             Required Tags: {string.Join(", ", requiredTags.Select(t => t.name))}
-                             Show In: {showIn}
-                             Forbid Death Drop: {forbidDeathDrop}
+                           Registered slot with key '{key}'.
+                           === Slot Settings ===
+                           Required Tags: {string.Join(", ", requiredTags.Select(t => t.name))}
+                           {settings}
                            """);
         }
 
@@ -127,12 +126,24 @@ namespace Duckov_CashSlot
             return IsInitialized && RegisteredSlots.ContainsKey(key);
         }
 
+        public static SlotSettings? GetRegisteredSlotSettings(Slot slot)
+        {
+            var key = slot.Key;
+            if (!IsInitialized) return null;
+
+            return RegisteredSlots.TryGetValue(key, out var registeredSlot)
+                ? registeredSlot.Settings
+                : null;
+        }
+
         public static ShowIn GetSlotShowIn(Slot slot)
         {
             var key = slot.Key;
             if (!IsInitialized) return ShowIn.Character;
 
-            return RegisteredSlots.TryGetValue(key, out var registeredSlot) ? registeredSlot.ShowIn : ShowIn.Character;
+            return RegisteredSlots.TryGetValue(key, out var registeredSlot)
+                ? registeredSlot.Settings.ShowIn
+                : ShowIn.Character;
         }
 
         public static bool IsSlotForbidDeathDrop(Slot slot)
@@ -140,7 +151,17 @@ namespace Duckov_CashSlot
             var key = slot.Key;
             if (!IsInitialized) return false;
 
-            return RegisteredSlots.TryGetValue(key, out var registeredSlot) && registeredSlot.ForbidDeathDrop;
+            return RegisteredSlots.TryGetValue(key, out var registeredSlot)
+                   && registeredSlot.Settings.ForbidDeathDrop;
+        }
+
+        public static bool IsSlotForbidWeightCalculation(Slot slot)
+        {
+            var key = slot.Key;
+            if (!IsInitialized) return false;
+
+            return RegisteredSlots.TryGetValue(key, out var registeredSlot)
+                   && registeredSlot.Settings.ForbidWeightCalculation;
         }
 
         public static int GetSlotInventoryIndex(Slot slot)
@@ -243,18 +264,6 @@ namespace Duckov_CashSlot
                 var text = LocalizationManager.GetPlainText(key);
                 LocalizationManager.SetOverrideText($"Tag_{tag.name}", text);
             }
-        }
-
-        public class RegisteredSlot(
-            string key,
-            Tag[] requiredTags,
-            ShowIn showIn = ShowIn.Character,
-            bool forbidDeathDrop = false)
-        {
-            public string Key { get; } = key;
-            public Tag[] RequiredTags { get; } = requiredTags;
-            public ShowIn ShowIn { get; } = showIn;
-            public bool ForbidDeathDrop { get; } = forbidDeathDrop;
         }
     }
 }

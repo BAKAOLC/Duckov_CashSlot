@@ -1,4 +1,4 @@
-﻿using Duckov_CashSlot.Enums;
+﻿using Duckov_CashSlot.Data;
 using Duckov.UI;
 using HarmonyLib;
 using UnityEngine.UI;

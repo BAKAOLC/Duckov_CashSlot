@@ -25,7 +25,7 @@ namespace Duckov_CashSlot.HarmonyPatches
         {
             var cashInventoryDisplay =
                 Object.Instantiate(itemSlotCollectionDisplay, petInventoryDisplay.transform);
-            cashInventoryDisplay.name = "PetSlotCollectionDisplay";
+            cashInventoryDisplay.name = ModConstant.SlotCollectionDisplayName;
         }
     }
 }

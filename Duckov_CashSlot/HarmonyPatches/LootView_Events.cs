@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using Duckov.UI;
 using HarmonyLib;
 
@@ -22,15 +21,15 @@ namespace Duckov_CashSlot.HarmonyPatches
             if (___petInventoryDisplay == null) return;
 
             var petSlotCollectionDisplayTransform =
-                ___petInventoryDisplay.transform.Find("PetSlotCollectionDisplay");
+                ___petInventoryDisplay.transform.Find(ModConstant.SlotCollectionDisplayName);
             if (petSlotCollectionDisplayTransform == null) return;
 
             var petSlotCollectionDisplay =
                 petSlotCollectionDisplayTransform.GetComponent<ItemSlotCollectionDisplay>();
             if (petSlotCollectionDisplay == null) return;
 
-            var onCharacterSlotItemDoubleClickedMethod = typeof(LootView)
-                .GetMethod("OnCharacterSlotItemDoubleClicked", BindingFlags.NonPublic | BindingFlags.Instance);
+            var onCharacterSlotItemDoubleClickedMethod = AccessTools.Method(typeof(LootView),
+                "OnCharacterSlotItemDoubleClicked", [typeof(ItemSlotCollectionDisplay), typeof(SlotDisplay)]);
             if (onCharacterSlotItemDoubleClickedMethod == null) return;
 
             petSlotCollectionDisplay.onElementDoubleClicked += OnElementDoubleClicked;
@@ -59,7 +58,7 @@ namespace Duckov_CashSlot.HarmonyPatches
             }
 
             var petSlotCollectionDisplayTransform =
-                ___petInventoryDisplay.transform.Find("PetSlotCollectionDisplay");
+                ___petInventoryDisplay.transform.Find(ModConstant.SlotCollectionDisplayName);
             if (petSlotCollectionDisplayTransform == null) return;
 
             var petSlotCollectionDisplay =

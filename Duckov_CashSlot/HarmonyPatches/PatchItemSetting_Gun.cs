@@ -72,7 +72,7 @@ namespace Duckov_CashSlot.HarmonyPatches
                 existingInfo.count += slot.Content.StackCount;
             }
         }
-        
+
         [HarmonyPatch(typeof(ItemSetting_Gun), nameof(ItemSetting_Gun.AutoSetTypeInInventory))]
         [HarmonyPostfix]
         // ReSharper disable InconsistentNaming
@@ -81,12 +81,12 @@ namespace Duckov_CashSlot.HarmonyPatches
                 ref bool __result,
                 int ___caliberHash,
                 Inventory inventory)
-                // ReSharper restore InconsistentNaming
+            // ReSharper restore InconsistentNaming
         {
             if (inventory == null) return;
             if (inventory.AttachedToItem == null) return;
             if (inventory.AttachedToItem.Slots == null || inventory.AttachedToItem.Slots.Count == 0) return;
-            
+
             var str = __instance.Item.Constants.GetString(___caliberHash);
             foreach (var slot in inventory.AttachedToItem.Slots)
             {
@@ -95,7 +95,7 @@ namespace Duckov_CashSlot.HarmonyPatches
                 if (!slot.Content.GetBool("IsBullet")) continue;
                 if (slot.Content.Constants.GetString(___caliberHash) != str) continue;
                 if (!SlotManager.IsRegisteredSlot(slot)) continue;
-                
+
                 __instance.SetTargetBulletType(slot.Content);
                 __result = true;
                 break;

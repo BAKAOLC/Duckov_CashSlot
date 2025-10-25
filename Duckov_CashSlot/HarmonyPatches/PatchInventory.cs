@@ -12,7 +12,7 @@ namespace Duckov_CashSlot.HarmonyPatches
         [HarmonyPostfix]
         // ReSharper disable InconsistentNaming
         private static void Inventory_FindAll_Postfix(Inventory __instance, List<Item> __result, Predicate<Item> match)
-        // ReSharper restore InconsistentNaming
+            // ReSharper restore InconsistentNaming
         {
             var item = __instance.AttachedToItem;
             if (item == null) return;
@@ -24,7 +24,7 @@ namespace Duckov_CashSlot.HarmonyPatches
                 if (!match(slot.Content)) continue;
                 itemInSlots.Add(slot.Content);
             }
-            
+
             __result.InsertRange(0, itemInSlots);
         }
     }

@@ -47,7 +47,7 @@ namespace Duckov_CashSlot.HarmonyPatches
         private static void ResetGridLayout(ItemSlotCollectionDisplay slotCollectionDisplay)
         {
             if (slotCollectionDisplay.Target.Slots.Count > 3) return; // 如果超过 3 个槽位，不阻止界面修改
-            
+
             var layoutElement = slotCollectionDisplay.GetComponent<LayoutElement>();
             if (layoutElement == null) return;
 

@@ -5,10 +5,12 @@ namespace Duckov_CashSlot.Data
     public readonly struct SlotSettings(
         ShowIn showIn = ShowIn.Character,
         bool forbidDeathDrop = false,
-        bool forbidWeightCalculation = false)
+        bool forbidWeightCalculation = false,
+        bool forbidItemsWithSameID = false)
     {
         public ShowIn ShowIn { get; } = showIn;
         public bool ForbidDeathDrop { get; } = forbidDeathDrop;
+        public bool ForbidItemsWithSameID { get; } = forbidItemsWithSameID;
         public bool ForbidWeightCalculation { get; } = forbidWeightCalculation;
 
         public override string ToString()
@@ -16,6 +18,7 @@ namespace Duckov_CashSlot.Data
             var stringBuilder = new StringBuilder();
             stringBuilder.AppendLine($"Show In: {ShowIn}");
             stringBuilder.AppendLine($"Forbid Death Drop: {ForbidDeathDrop}");
+            stringBuilder.AppendLine($"Forbid Items With Same ID: {ForbidItemsWithSameID}");
             stringBuilder.Append($"Forbid Weight Calculation: {ForbidWeightCalculation}");
             return stringBuilder.ToString();
         }

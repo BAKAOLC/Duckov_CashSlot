@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using HarmonyLib;
 using ItemStatsSystem;
+using UnityEngine;
 
 namespace Duckov_CashSlot.HarmonyPatches
 {
@@ -29,13 +30,10 @@ namespace Duckov_CashSlot.HarmonyPatches
 
             if (removeWeight <= 0f) return;
 
-            var oldTotalWeight = __result;
-            __result -= removeWeight;
+            __result = Mathf.Max(0f, __result - removeWeight);
+
             _cachedTotalWeightField ??= AccessTools.Field(typeof(Item), "_cachedTotalWeight");
             _cachedTotalWeightField?.SetValue(__instance, __result);
-
-            ModLogger.Log(
-                $"Adjusted total weight of item '{__instance.name}' by removing {removeWeight} kg from registered slots. {oldTotalWeight} kg -> {__result} kg.");
         }
     }
 }

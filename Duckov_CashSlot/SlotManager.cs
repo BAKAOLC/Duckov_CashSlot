@@ -2,6 +2,7 @@
 using System.Linq;
 using Duckov_CashSlot.Data;
 using Duckov.Utilities;
+using HarmonyLib;
 using ItemStatsSystem;
 using ItemStatsSystem.Items;
 using SodaCraft.Localizations;
@@ -233,9 +234,12 @@ namespace Duckov_CashSlot
 
                 var slot = new Slot(registeredSlot.Key);
                 slot.requireTags.AddRange(registeredSlot.RequiredTags);
+                var forbidItemsWithSameIDField = AccessTools.Field(typeof(Slot), "forbidItemsWithSameID");
+                forbidItemsWithSameIDField.SetValue(slot, registeredSlot.Settings.ForbidItemsWithSameID);
 
                 slot.Initialize(slotCollection);
                 slotCollection.Add(slot);
+                ModLogger.Log($"Added slot with key '{registeredSlot.Key}' to SlotCollection.");
             }
         }
 

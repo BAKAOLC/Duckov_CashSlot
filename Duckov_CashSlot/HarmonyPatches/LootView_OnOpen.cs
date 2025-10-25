@@ -20,7 +20,7 @@ namespace Duckov_CashSlot.HarmonyPatches
                 ___petInventoryDisplay.transform.Find(ModConstant.SlotCollectionDisplayName);
             if (petSlotCollectionDisplayTransform == null) return;
 
-            ModLogger.Log("Setting up cash slot display in loot view.");
+            ModLogger.Log("Setting up slot display in loot view.");
 
             var petSlotCollectionDisplay = petSlotCollectionDisplayTransform.GetComponent<ItemSlotCollectionDisplay>();
             ItemSlotCollectionDisplay_Setup.CurrentShowIn = ShowIn.Pet;
@@ -46,12 +46,32 @@ namespace Duckov_CashSlot.HarmonyPatches
 
         private static void ResetGridLayout(ItemSlotCollectionDisplay slotCollectionDisplay)
         {
-            if (slotCollectionDisplay.Target.Slots.Count > 3) return; // 如果超过 3 个槽位，不阻止界面修改
+            var gridLayout = slotCollectionDisplay.transform.Find("GridLayout");
+            if (gridLayout == null) return;
+
+            var gridLayoutGroup = gridLayout.GetComponent<GridLayoutGroup>();
+            if (gridLayoutGroup == null) return;
 
             var layoutElement = slotCollectionDisplay.GetComponent<LayoutElement>();
             if (layoutElement == null) return;
 
-            layoutElement.preferredHeight = -1;
+            var cellH = gridLayoutGroup.cellSize.y;
+            var spacingY = gridLayoutGroup.spacing.y;
+            var pad = gridLayoutGroup.padding;
+
+            var childCount = gridLayout.childCount;
+            if (childCount <= ModConstant.PetSlotDisplayCount)
+            {
+                layoutElement.minHeight = -1;
+                layoutElement.preferredHeight = -1;
+                return;
+            }
+
+            const int rows = ModConstant.PetSlotDisplayCount;
+            var minHeight = pad.top + pad.bottom + rows * cellH + (rows - 1) * spacingY;
+            var preferredHeight = pad.top + pad.bottom + rows * cellH + (rows + 1) * spacingY;
+            layoutElement.minHeight = minHeight;
+            layoutElement.preferredHeight = preferredHeight;
         }
     }
     // ReSharper restore InconsistentNaming

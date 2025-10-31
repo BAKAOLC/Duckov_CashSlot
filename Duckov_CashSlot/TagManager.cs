@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Duckov.Utilities;
 using ItemStatsSystem;
 
@@ -6,6 +7,7 @@ namespace Duckov_CashSlot
 {
     public static class TagManager
     {
+        private static readonly HashSet<Item> TrackedItems = [];
         private static Tag DontDropOnDeadTag => GameplayDataSettings.Tags.DontDropOnDeadInSlot;
 
         public static Tag? GetTagByName(string tagName)
@@ -18,7 +20,8 @@ namespace Duckov_CashSlot
             if (item == null) return;
             if (item.Tags.Contains(DontDropOnDeadTag)) return;
 
-            item.Tags.Add(GameplayDataSettings.Tags.DontDropOnDeadInSlot);
+            item.Tags.Add(DontDropOnDeadTag);
+            TrackedItems.Add(item);
 
             ModLogger.Log($"Added 'DontDropOnDeadInSlot' tag to item '{item.TypeID}'.");
         }
@@ -27,11 +30,11 @@ namespace Duckov_CashSlot
         {
             if (item == null) return;
             if (!item.Tags.Contains(DontDropOnDeadTag)) return;
+            if (!TrackedItems.Contains(item)) return;
 
-            var originalMetaData = ItemAssetsCollection.GetMetaData(item.TypeID);
-            if (originalMetaData.tags.Contains(DontDropOnDeadTag)) return;
-
+            TrackedItems.Remove(item);
             item.Tags.Remove(DontDropOnDeadTag);
+
             ModLogger.Log($"Removed 'DontDropOnDeadInSlot' tag from item '{item.TypeID}'.");
         }
     }

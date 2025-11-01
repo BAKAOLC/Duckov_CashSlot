@@ -4,7 +4,7 @@
     {
         public const string SlotCollectionDisplayName = "PetSlotCollectionDisplay";
         public const int KeyRingTypeID = 836;
-        public const int InventorySlotDisplayRows = 3;
+        public const int InventorySlotDisplayRows = 2;
         public const int PetSlotDisplayRows = 3;
     }
 }

@@ -116,7 +116,7 @@ namespace Duckov_CashSlot
             scrollRect.viewport = _viewport;
             scrollRect.movementType = ScrollRect.MovementType.Clamped;
             scrollRect.content = _gridRectTransform;
-            scrollRect.scrollSensitivity = 20f;
+            scrollRect.scrollSensitivity = 1f;
 
             _scrollRect = scrollRect;
             return true;

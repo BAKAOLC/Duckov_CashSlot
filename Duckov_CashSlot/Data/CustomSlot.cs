@@ -6,11 +6,13 @@ namespace Duckov_CashSlot.Data
     public class CustomSlot(string key, string[] requiredTags, SlotSettings settings)
     {
         public string Key { get; private set; } = key;
-        public string[] RequiredTags { get; } = requiredTags;
+        public string[] RequiredTags { get; private set; } = requiredTags;
         public SlotSettings Settings { get; private set; } = settings;
 
         public void Validate()
         {
+            Key ??= string.Empty;
+            RequiredTags ??= [];
             if (string.IsNullOrWhiteSpace(Key)) Key = Guid.NewGuid().ToString();
             var validTags = new List<string>();
             foreach (var tag in RequiredTags)

@@ -41,7 +41,7 @@ namespace Duckov_CashSlot
                 ModLogger.LogError("Failed to find GridLayout in SlotCollectionDisplay.");
                 return;
             }
-            
+
             if (!GetComponent<DynamicElementLayout>(gridLayoutObject.gameObject, out var dynamicElementLayout,
                     true))
             {

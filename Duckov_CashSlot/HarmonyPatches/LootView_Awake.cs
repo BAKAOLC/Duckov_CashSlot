@@ -1,7 +1,6 @@
 ﻿using Duckov.UI;
 using HarmonyLib;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Duckov_CashSlot.HarmonyPatches
 {

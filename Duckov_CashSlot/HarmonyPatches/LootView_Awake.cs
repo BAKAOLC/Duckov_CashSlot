@@ -1,6 +1,7 @@
 ﻿using Duckov.UI;
 using HarmonyLib;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Duckov_CashSlot.HarmonyPatches
 {
@@ -23,9 +24,9 @@ namespace Duckov_CashSlot.HarmonyPatches
         private static void CreatePetSlotCollectionDisplay(InventoryDisplay petInventoryDisplay,
             ItemSlotCollectionDisplay itemSlotCollectionDisplay)
         {
-            var cashInventoryDisplay =
+            var petItemSlotCollectionDisplay =
                 Object.Instantiate(itemSlotCollectionDisplay, petInventoryDisplay.transform);
-            cashInventoryDisplay.name = ModConstant.SlotCollectionDisplayName;
+            petItemSlotCollectionDisplay.name = ModConstant.SlotCollectionDisplayName;
         }
     }
 }

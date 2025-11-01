@@ -17,5 +17,21 @@ namespace Duckov_CashSlot.Configs
             InventorySlotDisplayRows = ModConstant.InventorySlotDisplayRows;
             PetSlotDisplayRows = ModConstant.PetSlotDisplayRows;
         }
+
+        public override void Validate()
+        {
+            if (InventorySlotDisplayRows < 1)
+            {
+                ModLogger.LogWarning("InventorySlotDisplayRows is less than 1. Resetting to default.");
+                InventorySlotDisplayRows = ModConstant.InventorySlotDisplayRows;
+            }
+
+            // ReSharper disable once InvertIf
+            if (PetSlotDisplayRows < 1)
+            {
+                ModLogger.LogWarning("PetSlotDisplayRows is less than 1. Resetting to default.");
+                PetSlotDisplayRows = ModConstant.PetSlotDisplayRows;
+            }
+        }
     }
 }

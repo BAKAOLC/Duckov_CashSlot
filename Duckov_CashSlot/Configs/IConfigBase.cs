@@ -4,6 +4,7 @@
     {
         void LoadDefault();
         void LoadFromFile(string filePath);
-        void SaveToFile(string filePath);
+        void SaveToFile(string filePath, bool withBackup = true);
+        void Validate();
     }
 }

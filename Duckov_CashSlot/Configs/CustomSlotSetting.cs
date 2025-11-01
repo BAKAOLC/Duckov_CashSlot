@@ -19,6 +19,12 @@ namespace Duckov_CashSlot.Configs
             ];
         }
 
+        public override void Validate()
+        {
+            CustomSlots ??= [];
+            foreach (var slot in CustomSlots) slot.Validate();
+        }
+
         public override void LoadFromFile(string filePath)
         {
             try
@@ -36,6 +42,8 @@ namespace Duckov_CashSlot.Configs
                 var json = File.ReadAllText(filePath);
                 var customSlots = JsonConvert.DeserializeObject<CustomSlot[]>(json, ConfigManager.JsonSettings);
                 CustomSlots = customSlots ?? [];
+                Validate();
+                SaveToFile(filePath);
                 return;
             }
             catch (IOException e)
@@ -56,11 +64,13 @@ namespace Duckov_CashSlot.Configs
             SaveToFile(filePath);
         }
 
-        public override void SaveToFile(string filePath)
+        public override void SaveToFile(string filePath, bool withBackup = true)
         {
             try
             {
                 ConfigManager.CreateDirectoryIfNotExists();
+
+                if (withBackup && File.Exists(filePath)) ConfigManager.CreateBackupFile(filePath);
 
                 var json = JsonConvert.SerializeObject(CustomSlots, ConfigManager.JsonSettings);
                 File.WriteAllText(filePath, json);

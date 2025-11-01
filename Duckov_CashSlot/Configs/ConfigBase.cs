@@ -4,10 +4,12 @@ using Newtonsoft.Json;
 
 namespace Duckov_CashSlot.Configs
 {
-    public abstract class ConfigBase
+    public abstract class ConfigBase : IConfigBase
     {
         // ReSharper disable once MemberCanBeProtected.Global
         public abstract void LoadDefault();
+
+        public abstract void Validate();
 
         public virtual void LoadFromFile(string filePath)
         {
@@ -25,6 +27,8 @@ namespace Duckov_CashSlot.Configs
 
                 var json = File.ReadAllText(filePath);
                 JsonConvert.PopulateObject(json, this, ConfigManager.JsonSettings);
+                Validate();
+                SaveToFile(filePath);
             }
             catch (Exception ex)
             {
@@ -34,11 +38,13 @@ namespace Duckov_CashSlot.Configs
             }
         }
 
-        public virtual void SaveToFile(string filePath)
+        public virtual void SaveToFile(string filePath, bool withBackup = true)
         {
             try
             {
                 ConfigManager.CreateDirectoryIfNotExists();
+
+                if (withBackup && File.Exists(filePath)) ConfigManager.CreateBackupFile(filePath);
 
                 var json = JsonConvert.SerializeObject(this, ConfigManager.JsonSettings);
                 File.WriteAllText(filePath, json);

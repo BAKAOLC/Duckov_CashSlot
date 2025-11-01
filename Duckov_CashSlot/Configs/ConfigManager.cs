@@ -35,5 +35,20 @@ namespace Duckov_CashSlot.Configs
             var configFilePath = Path.Combine(ConfigBaseDirectory, configName);
             configInstance.SaveToFile(configFilePath);
         }
+
+        public static void CreateBackupFile(string originalFilePath)
+        {
+            try
+            {
+                if (!File.Exists(originalFilePath)) return;
+                var backupFilePath = $"{originalFilePath}.bak";
+                File.Copy(originalFilePath, backupFilePath, true);
+                ModLogger.Log($"Backup created at: {backupFilePath}");
+            }
+            catch (IOException e)
+            {
+                ModLogger.LogError($"Failed to create backup file: {e.Message}");
+            }
+        }
     }
 }

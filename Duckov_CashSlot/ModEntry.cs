@@ -1,4 +1,6 @@
-﻿namespace Duckov_CashSlot
+﻿using Duckov_CashSlot.Configs;
+
+namespace Duckov_CashSlot
 {
     public static class ModEntry
     {
@@ -6,6 +8,7 @@
         {
             SlotManager.Initialize();
             CustomSlotManager.Initialize();
+            _ = SlotDisplaySetting.Instance; // Ensure SlotDisplaySetting is loaded
 
             var cashTag = TagManager.GetTagByName("Cash");
             if (cashTag != null) SlotManager.RegisterTagLocalization(cashTag, "Item_Cash");

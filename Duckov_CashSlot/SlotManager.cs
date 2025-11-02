@@ -236,7 +236,7 @@ namespace Duckov_CashSlot
             if (!IsInitialized) return false;
 
             return RegisteredSlots.TryGetValue(key, out var registeredSlot)
-                   && !registeredSlot.Settings.EnableModifier;
+                   && registeredSlot.Settings.DisableModifier;
         }
 
         public static int GetSlotInventoryIndex(Slot slot)

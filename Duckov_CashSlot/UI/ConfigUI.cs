@@ -363,7 +363,7 @@ namespace Duckov_CashSlot.UI
                 ForbidDeathDrop = source.ForbidDeathDrop,
                 ForbidWeightCalculation = source.ForbidWeightCalculation,
                 ForbidItemsWithSameID = source.ForbidItemsWithSameID,
-                EnableModifier = source.EnableModifier,
+                DisableModifier = source.DisableModifier,
             };
         }
 
@@ -412,7 +412,7 @@ namespace Duckov_CashSlot.UI
             slot.ForbidDeathDrop = GUILayout.Toggle(slot.ForbidDeathDrop, "禁止死亡掉落");
             slot.ForbidWeightCalculation = GUILayout.Toggle(slot.ForbidWeightCalculation, "禁止重量计算");
             slot.ForbidItemsWithSameID = GUILayout.Toggle(slot.ForbidItemsWithSameID, "禁止相同ID物品");
-            slot.EnableModifier = GUILayout.Toggle(slot.EnableModifier, "启用物品属性修正");
+            slot.DisableModifier = GUILayout.Toggle(slot.DisableModifier, "禁用物品属性修正词条（比如移动速度、背包容量等）");
 
             GUILayout.FlexibleSpace();
 
@@ -459,7 +459,7 @@ namespace Duckov_CashSlot.UI
                 ForbidDeathDrop = slot.Settings.ForbidDeathDrop,
                 ForbidWeightCalculation = slot.Settings.ForbidWeightCalculation,
                 ForbidItemsWithSameID = slot.Settings.ForbidItemsWithSameID,
-                EnableModifier = slot.Settings.EnableModifier,
+                DisableModifier = slot.Settings.DisableModifier,
             }).ToList();
 
             RefreshPositionInputs();
@@ -477,7 +477,7 @@ namespace Duckov_CashSlot.UI
                 ForbidDeathDrop = slot.Settings.ForbidDeathDrop,
                 ForbidWeightCalculation = slot.Settings.ForbidWeightCalculation,
                 ForbidItemsWithSameID = slot.Settings.ForbidItemsWithSameID,
-                EnableModifier = slot.Settings.EnableModifier,
+                DisableModifier = slot.Settings.DisableModifier,
             }).ToList();
 
             _slotBackups.Clear();
@@ -518,7 +518,7 @@ namespace Duckov_CashSlot.UI
                     slot.ForbidDeathDrop,
                     slot.ForbidWeightCalculation,
                     slot.ForbidItemsWithSameID,
-                    slot.EnableModifier
+                    slot.DisableModifier
                 )
             )).ToArray();
 
@@ -544,7 +544,7 @@ namespace Duckov_CashSlot.UI
                 ForbidDeathDrop = slot.Settings.ForbidDeathDrop,
                 ForbidWeightCalculation = slot.Settings.ForbidWeightCalculation,
                 ForbidItemsWithSameID = slot.Settings.ForbidItemsWithSameID,
-                EnableModifier = slot.Settings.EnableModifier,
+                DisableModifier = slot.Settings.DisableModifier,
             }).ToList();
             _selectedSlotIndex = -1;
         }
@@ -560,7 +560,7 @@ namespace Duckov_CashSlot.UI
                 ForbidDeathDrop = false,
                 ForbidWeightCalculation = false,
                 ForbidItemsWithSameID = false,
-                EnableModifier = true,
+                DisableModifier = false,
             });
             _selectedSlotIndex = _tempCustomSlots.Count - 1;
             RefreshPositionInputs();
@@ -574,7 +574,7 @@ namespace Duckov_CashSlot.UI
             public bool ForbidDeathDrop { get; set; }
             public bool ForbidWeightCalculation { get; set; }
             public bool ForbidItemsWithSameID { get; set; }
-            public bool EnableModifier { get; set; } = true;
+            public bool DisableModifier { get; set; }
         }
     }
 }

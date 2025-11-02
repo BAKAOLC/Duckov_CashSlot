@@ -17,7 +17,7 @@ namespace Duckov_CashSlot.Configs
                 forbidDeathDrop: true,
                 forbidWeightCalculation: true,
                 forbidItemsWithSameID: false,
-                enableModifier: true);
+                disableModifier: false);
             // ReSharper restore All
 
             CustomSlots =

@@ -498,11 +498,17 @@ namespace Duckov_CashSlot.UI
             var config = SlotDisplaySetting.Instance;
             config.InventorySlotDisplayRows = _tempDisplaySetting.InventorySlotDisplayRows;
             config.PetSlotDisplayRows = _tempDisplaySetting.PetSlotDisplayRows;
+            config.PetSlotDisplayColumns = _tempDisplaySetting.PetSlotDisplayColumns;
+            config.PetInventoryDisplayColumns = _tempDisplaySetting.PetInventoryDisplayColumns;
+            config.NewSuperPetDisplayCompact = _tempDisplaySetting.NewSuperPetDisplayCompact;
             config.Validate();
             ConfigManager.SaveConfigToFile(config, "SlotDisplaySetting.json");
 
             _tempDisplaySetting.InventorySlotDisplayRows = config.InventorySlotDisplayRows;
             _tempDisplaySetting.PetSlotDisplayRows = config.PetSlotDisplayRows;
+            _tempDisplaySetting.PetSlotDisplayColumns = config.PetSlotDisplayColumns;
+            _tempDisplaySetting.PetInventoryDisplayColumns = config.PetInventoryDisplayColumns;
+            _tempDisplaySetting.NewSuperPetDisplayCompact = config.NewSuperPetDisplayCompact;
 
             ModLogger.Log("槽位行数配置已保存");
         }

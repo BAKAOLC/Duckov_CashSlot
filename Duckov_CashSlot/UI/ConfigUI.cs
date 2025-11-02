@@ -148,56 +148,33 @@ namespace Duckov_CashSlot.UI
 
             GUILayout.BeginVertical("box", GUILayout.ExpandHeight(true));
 
-            GUILayout.Label("库存槽位显示行数", GUI.skin.label);
-            var inventoryRows = _tempDisplaySetting.InventorySlotDisplayRows;
-            GUILayout.BeginHorizontal();
-            GUILayout.Label($"当前值: {inventoryRows}", GUILayout.Width(200));
-            if (GUILayout.Button("-", GUILayout.Width(30)))
-                if (inventoryRows > 1)
-                    _tempDisplaySetting.InventorySlotDisplayRows--;
-            if (GUILayout.Button("+", GUILayout.Width(30))) _tempDisplaySetting.InventorySlotDisplayRows++;
-            GUILayout.EndHorizontal();
+            _tempDisplaySetting.InventorySlotDisplayRows =
+                DrawQuantityConfig("玩家库存侧槽位列表最大显示行数", _tempDisplaySetting.InventorySlotDisplayRows);
 
             GUILayout.Space(10);
 
-            GUILayout.Label("宠物槽位显示行数", GUI.skin.label);
-            var petRows = _tempDisplaySetting.PetSlotDisplayRows;
-            GUILayout.BeginHorizontal();
-            GUILayout.Label($"当前值: {petRows}", GUILayout.Width(200));
-            if (GUILayout.Button("-", GUILayout.Width(30)))
-                if (petRows > 1)
-                    _tempDisplaySetting.PetSlotDisplayRows--;
-            if (GUILayout.Button("+", GUILayout.Width(30))) _tempDisplaySetting.PetSlotDisplayRows++;
-            GUILayout.EndHorizontal();
+            _tempDisplaySetting.PetSlotDisplayRows =
+                DrawQuantityConfig("宠物侧槽位列表最大显示行数", _tempDisplaySetting.PetSlotDisplayRows);
 
             GUILayout.Space(10);
 
-            GUILayout.Label("宠物槽位显示列数", GUI.skin.label);
-            var petColumns = _tempDisplaySetting.PetSlotDisplayColumns;
-            GUILayout.BeginHorizontal();
-            GUILayout.Label($"当前值: {petColumns}", GUILayout.Width(200));
-            if (GUILayout.Button("-", GUILayout.Width(30)))
-                if (petColumns > 1)
-                    _tempDisplaySetting.PetSlotDisplayColumns--;
-            if (GUILayout.Button("+", GUILayout.Width(30))) _tempDisplaySetting.PetSlotDisplayColumns++;
-            GUILayout.EndHorizontal();
+            _tempDisplaySetting.PetSlotDisplayColumns =
+                DrawQuantityConfig("宠物侧槽位列表显示列数", _tempDisplaySetting.PetSlotDisplayColumns);
 
             GUILayout.Space(10);
 
-            GUILayout.Label("宠物槽位显示列数", GUI.skin.label);
-            var petInventoryColumns = _tempDisplaySetting.PetInventoryDisplayColumns;
-            GUILayout.BeginHorizontal();
-            GUILayout.Label($"当前值: {petInventoryColumns}", GUILayout.Width(200));
-            if (GUILayout.Button("-", GUILayout.Width(30)))
-                if (petInventoryColumns > 1)
-                    _tempDisplaySetting.PetInventoryDisplayColumns--;
-            if (GUILayout.Button("+", GUILayout.Width(30))) _tempDisplaySetting.PetInventoryDisplayColumns++;
-            GUILayout.EndHorizontal();
+            _tempDisplaySetting.PetInventoryDisplayColumns =
+                DrawQuantityConfig("宠物侧背包列表显示列数", _tempDisplaySetting.PetInventoryDisplayColumns);
 
             GUILayout.Space(10);
 
             _tempDisplaySetting.NewSuperPetDisplayCompact =
-                GUILayout.Toggle(_tempDisplaySetting.NewSuperPetDisplayCompact, "是否启用新版本 Super Pet 显示样式适配");
+                GUILayout.Toggle(_tempDisplaySetting.NewSuperPetDisplayCompact,
+                    "是否启用新版本 Super Pet 显示样式适配");
+
+            _tempDisplaySetting.AllowModifyOtherModPetDisplay =
+                GUILayout.Toggle(_tempDisplaySetting.AllowModifyOtherModPetDisplay,
+                    "是否允许本 Mod 修改其它 Mod 修改的宠物背包显示样式");
 
             GUILayout.Space(20);
 
@@ -213,6 +190,23 @@ namespace Duckov_CashSlot.UI
             GUILayout.EndHorizontal();
 
             GUILayout.EndVertical();
+        }
+
+        private static int DrawQuantityConfig(string label, int currentValue)
+        {
+            var quantity = currentValue;
+
+            GUILayout.Label(label, GUI.skin.label);
+
+            using (new GUILayout.HorizontalScope())
+            {
+                GUILayout.Label($"当前值: {quantity}", GUILayout.Width(200));
+
+                if (GUILayout.Button("-", GUILayout.Width(30))) quantity = Math.Max(1, quantity - 1);
+                if (GUILayout.Button("+", GUILayout.Width(30))) quantity++;
+            }
+
+            return quantity;
         }
 
         private void DrawKeyCodeConfig()
@@ -452,11 +446,7 @@ namespace Duckov_CashSlot.UI
 
         private void LoadTempData()
         {
-            _tempDisplaySetting = new()
-            {
-                InventorySlotDisplayRows = SlotDisplaySetting.Instance.InventorySlotDisplayRows,
-                PetSlotDisplayRows = SlotDisplaySetting.Instance.PetSlotDisplayRows,
-            };
+            _tempDisplaySetting = SlotDisplaySetting.Instance.Clone() as SlotDisplaySetting;
 
             _originalConfig = ConfigManager.LoadConfigFromFile<CustomSlotSetting>(CustomSlotManager.ConfigName, false);
             _tempCustomSlots = _originalConfig.CustomSlots.Select(slot => new CustomSlotEditingData
@@ -496,24 +486,15 @@ namespace Duckov_CashSlot.UI
             if (_tempDisplaySetting == null) return;
 
             var config = SlotDisplaySetting.Instance;
-            config.InventorySlotDisplayRows = _tempDisplaySetting.InventorySlotDisplayRows;
-            config.PetSlotDisplayRows = _tempDisplaySetting.PetSlotDisplayRows;
-            config.PetSlotDisplayColumns = _tempDisplaySetting.PetSlotDisplayColumns;
-            config.PetInventoryDisplayColumns = _tempDisplaySetting.PetInventoryDisplayColumns;
-            config.NewSuperPetDisplayCompact = _tempDisplaySetting.NewSuperPetDisplayCompact;
+            config.CopyFrom(_tempDisplaySetting);
             config.Validate();
             ConfigManager.SaveConfigToFile(config, "SlotDisplaySetting.json");
 
-            _tempDisplaySetting.InventorySlotDisplayRows = config.InventorySlotDisplayRows;
-            _tempDisplaySetting.PetSlotDisplayRows = config.PetSlotDisplayRows;
-            _tempDisplaySetting.PetSlotDisplayColumns = config.PetSlotDisplayColumns;
-            _tempDisplaySetting.PetInventoryDisplayColumns = config.PetInventoryDisplayColumns;
-            _tempDisplaySetting.NewSuperPetDisplayCompact = config.NewSuperPetDisplayCompact;
-
+            _tempDisplaySetting.CopyFrom(config);
             ModLogger.Log("槽位行数配置已保存");
         }
 
-        private void SaveKeyCodeConfig()
+        private static void SaveKeyCodeConfig()
         {
             var config = UIConfig.Instance;
             config.Validate();

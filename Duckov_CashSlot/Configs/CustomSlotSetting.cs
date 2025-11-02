@@ -29,6 +29,14 @@ namespace Duckov_CashSlot.Configs
             return isChanged;
         }
 
+        public override void CopyFrom(IConfigBase other)
+        {
+            if (other is not CustomSlotSetting otherSetting) return;
+            CustomSlots = new CustomSlot[otherSetting.CustomSlots.Length];
+            for (var i = 0; i < otherSetting.CustomSlots.Length; i++)
+                CustomSlots[i] = otherSetting.CustomSlots[i].Clone();
+        }
+
         public override void LoadFromFile(string filePath, bool autoSaveOnLoad = true)
         {
             try

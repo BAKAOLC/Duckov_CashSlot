@@ -13,8 +13,9 @@ namespace Duckov_CashSlot.Configs
         public int PetSlotDisplayRows { get; set; } = ModConstant.PetSlotDisplayRows;
         public int PetSlotDisplayColumns { get; set; } = ModConstant.PetSlotDisplayColumns;
         public int PetInventoryDisplayColumns { get; set; } = ModConstant.PetInventoryDisplayColumns;
-
-        public bool NewSuperPetDisplayCompact { get; set; }
+        
+        public bool NewSuperPetDisplayCompact { get; set; } // 是否启用新版本兼容性样式显示
+        public bool AllowModifyOtherModPetDisplay { get; set; } // 是否允许修改其他模组的宠物物品栏显示
 
         public override void LoadDefault()
         {
@@ -23,6 +24,7 @@ namespace Duckov_CashSlot.Configs
             PetSlotDisplayColumns = ModConstant.PetSlotDisplayColumns;
             PetInventoryDisplayColumns = ModConstant.PetInventoryDisplayColumns;
             NewSuperPetDisplayCompact = false;
+            AllowModifyOtherModPetDisplay = false;
         }
 
         // ReSharper disable InvertIf
@@ -61,5 +63,16 @@ namespace Duckov_CashSlot.Configs
             return isChanged;
         }
         // ReSharper restore InvertIf
+
+        public override void CopyFrom(IConfigBase other)
+        {
+            if (other is not SlotDisplaySetting otherSetting) return;
+            InventorySlotDisplayRows = otherSetting.InventorySlotDisplayRows;
+            PetSlotDisplayRows = otherSetting.PetSlotDisplayRows;
+            PetSlotDisplayColumns = otherSetting.PetSlotDisplayColumns;
+            PetInventoryDisplayColumns = otherSetting.PetInventoryDisplayColumns;
+            NewSuperPetDisplayCompact = otherSetting.NewSuperPetDisplayCompact;
+            AllowModifyOtherModPetDisplay = otherSetting.AllowModifyOtherModPetDisplay;
+        }
     }
 }

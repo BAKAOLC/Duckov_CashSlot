@@ -21,5 +21,11 @@ namespace Duckov_CashSlot.Configs
         {
             return false;
         }
+
+        public override void CopyFrom(IConfigBase other)
+        {
+            if (other is not UIConfig otherSetting) return;
+            ToggleKey = otherSetting.ToggleKey;
+        }
     }
 }

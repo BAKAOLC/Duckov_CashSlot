@@ -7,7 +7,7 @@ namespace Duckov_CashSlot.Data
     {
         public string Key { get; private set; } = key;
         public string[] RequiredTags { get; private set; } = requiredTags;
-        public SlotSettings Settings { get; private set; } = settings;
+        public SlotSettings Settings { get; } = settings;
 
         public bool Validate()
         {
@@ -39,6 +39,11 @@ namespace Duckov_CashSlot.Data
             }
 
             return isChanged;
+        }
+
+        public CustomSlot Clone()
+        {
+            return new(Key, (string[])RequiredTags.Clone(), Settings);
         }
     }
 }

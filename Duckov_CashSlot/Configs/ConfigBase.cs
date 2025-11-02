@@ -11,6 +11,8 @@ namespace Duckov_CashSlot.Configs
 
         public abstract bool Validate();
 
+        public abstract void CopyFrom(IConfigBase other);
+
         public virtual void LoadFromFile(string filePath, bool autoSaveOnLoad = true)
         {
             try
@@ -52,6 +54,13 @@ namespace Duckov_CashSlot.Configs
             {
                 ModLogger.LogError($"Failed to save config to file '{filePath}': {ex.Message}");
             }
+        }
+
+        public virtual IConfigBase Clone()
+        {
+            var clone = (ConfigBase)Activator.CreateInstance(GetType());
+            clone.CopyFrom(this);
+            return clone;
         }
     }
 }

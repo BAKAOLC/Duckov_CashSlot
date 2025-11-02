@@ -55,18 +55,21 @@ namespace Duckov_CashSlot.HarmonyPatches
                 Utility.SetGridLayoutConstraintFixedColumnCount(gridLayout.gameObject,
                     SlotDisplaySetting.Instance.PetSlotDisplayColumns);
 
+            var allowModifyOtherModDisplay = SlotDisplaySetting.Instance.AllowModifyOtherModPetDisplay;
             if (IsSuperModPatched())
             {
                 CheckSuperPet(petInventoryDisplay, petSlotCollectionDisplay);
-                return;
-            }
-            
-            if (IsBetterDuckovPatched())
-            {
-                // Currently no specific adjustments for Better Duckov mod
-                return;
+                if (!allowModifyOtherModDisplay) return; // Skip further adjustments if not allowed
             }
 
+            if (IsBetterDuckovPatched() && !allowModifyOtherModDisplay)
+                return; // Skip further adjustments if not allowed
+
+            SetPetInventoryDisplayGridLayoutColumns(petInventoryDisplay);
+        }
+
+        private static void SetPetInventoryDisplayGridLayoutColumns(InventoryDisplay petInventoryDisplay)
+        {
             var petSlotGridLayout = petInventoryDisplay.transform.Find("Container/Layout");
             if (!petSlotGridLayout) return;
             Utility.SetGridLayoutConstraintFixedColumnCount(petSlotGridLayout.gameObject,
@@ -121,7 +124,6 @@ namespace Duckov_CashSlot.HarmonyPatches
 
         private static void CheckSuperPet_old(InventoryDisplay petInventoryDisplay,
             ItemSlotCollectionDisplay petSlotCollectionDisplay)
-
         {
             var gridLayoutElementField = AccessTools.Field(typeof(InventoryDisplay), "gridLayoutElement");
             if (gridLayoutElementField == null) return;
@@ -137,7 +139,7 @@ namespace Duckov_CashSlot.HarmonyPatches
             return Harmony.HasAnyPatches(ModConstant.SuperPetModID) ||
                    Harmony.HasAnyPatches(ModConstant.MergeMyModID);
         }
-        
+
         private static bool IsBetterDuckovPatched()
         {
             return Harmony.HasAnyPatches(ModConstant.BetterDuckovID);

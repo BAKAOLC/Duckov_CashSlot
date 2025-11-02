@@ -12,12 +12,14 @@ namespace Duckov_CashSlot.Configs
         public int InventorySlotDisplayRows { get; set; } = ModConstant.InventorySlotDisplayRows;
         public int PetSlotDisplayRows { get; set; } = ModConstant.PetSlotDisplayRows;
         public int PetSlotDisplayColumns { get; set; } = ModConstant.PetSlotDisplayColumns;
+        public bool NewSuperPetDisplayCompact { get; set; } = false;
 
         public override void LoadDefault()
         {
             InventorySlotDisplayRows = ModConstant.InventorySlotDisplayRows;
             PetSlotDisplayRows = ModConstant.PetSlotDisplayRows;
             PetSlotDisplayColumns = ModConstant.PetSlotDisplayColumns;
+            NewSuperPetDisplayCompact = false;
         }
 
         public override void Validate()

@@ -63,7 +63,7 @@ namespace Duckov_CashSlot.HarmonyPatches
                 Utility.ResetLayoutElementMinPreferredHeight(petSlotGridLayout.gameObject);
             }
 
-            CheckSuperPet(petInventoryDisplay);
+            CheckSuperPet(petInventoryDisplay, petSlotCollectionDisplay);
         }
 
         private static void SetContentSizeFitter(InventoryDisplay petInventoryDisplay)
@@ -77,8 +77,15 @@ namespace Duckov_CashSlot.HarmonyPatches
             ModLogger.Log("Adjusted ContentSizeFitter for pet inventory display.");
         }
 
-        private static void CheckSuperPet(InventoryDisplay petInventoryDisplay)
+        private static void CheckSuperPet(InventoryDisplay petInventoryDisplay,
+            ItemSlotCollectionDisplay petSlotCollectionDisplay)
         {
+            if (!SlotDisplaySetting.Instance.NewSuperPetDisplayCompact)
+            {
+                CheckSuperPet_old(petInventoryDisplay, petSlotCollectionDisplay);
+                return;
+            }
+
             var contentLayoutField = AccessTools.Field(typeof(InventoryDisplay), "contentLayout");
             if (contentLayoutField == null) return;
             var contentLayout = contentLayoutField.GetValue(petInventoryDisplay) as GridLayoutGroup;
@@ -102,6 +109,19 @@ namespace Duckov_CashSlot.HarmonyPatches
                 ModLogger.Log(
                     "Reset LayoutElement ignoreLayout for pet inventory display from probable Super Pet modification.");
             }
+        }
+
+        private static void CheckSuperPet_old(InventoryDisplay petInventoryDisplay,
+            ItemSlotCollectionDisplay petSlotCollectionDisplay)
+
+        {
+            var gridLayoutElementField = AccessTools.Field(typeof(InventoryDisplay), "gridLayoutElement");
+            if (gridLayoutElementField == null) return;
+            var layoutElement = gridLayoutElementField.GetValue(petInventoryDisplay) as LayoutElement;
+            if (!(layoutElement != null && layoutElement.ignoreLayout)) return;
+
+            petSlotCollectionDisplay.transform.SetSiblingIndex(2);
+            ModLogger.Log("Using old Super Pet adjustment for pet inventory display.");
         }
     }
     // ReSharper restore InconsistentNaming

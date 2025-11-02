@@ -6,6 +6,6 @@
         public const int KeyRingTypeID = 836;
         public const int InventorySlotDisplayRows = 2;
         public const int PetSlotDisplayRows = 3;
-        public const int PetSlotDisplayColumns = 3;
+        public const int PetSlotDisplayColumns = 1;
     }
 }

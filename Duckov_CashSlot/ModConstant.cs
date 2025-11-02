@@ -11,5 +11,6 @@
 
         public const string SuperPetModID = "SuperPet";
         public const string MergeMyModID = "MergeMyMOD";
+        public const string BetterDuckovID = "BetterDuckov";
     }
 }

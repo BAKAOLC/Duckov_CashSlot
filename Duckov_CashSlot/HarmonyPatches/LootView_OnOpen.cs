@@ -60,6 +60,12 @@ namespace Duckov_CashSlot.HarmonyPatches
                 CheckSuperPet(petInventoryDisplay, petSlotCollectionDisplay);
                 return;
             }
+            
+            if (IsBetterDuckovPatched())
+            {
+                // Currently no specific adjustments for Better Duckov mod
+                return;
+            }
 
             var petSlotGridLayout = petInventoryDisplay.transform.Find("Container/Layout");
             if (!petSlotGridLayout) return;
@@ -130,6 +136,11 @@ namespace Duckov_CashSlot.HarmonyPatches
         {
             return Harmony.HasAnyPatches(ModConstant.SuperPetModID) ||
                    Harmony.HasAnyPatches(ModConstant.MergeMyModID);
+        }
+        
+        private static bool IsBetterDuckovPatched()
+        {
+            return Harmony.HasAnyPatches(ModConstant.BetterDuckovID);
         }
     }
     // ReSharper restore InconsistentNaming

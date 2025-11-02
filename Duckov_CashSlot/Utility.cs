@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Duckov.UI;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Duckov_CashSlot
 {
@@ -50,6 +51,32 @@ namespace Duckov_CashSlot
             }
 
             dynamicElementLayout.SetMaxRows(showRows);
+        }
+
+        internal static void SetGridLayoutConstraintFixedColumnCount(
+            GameObject gridLayoutObject,
+            int columnCount)
+        {
+            if (!GetComponent<GridLayoutGroup>(gridLayoutObject, out var gridLayoutGroup))
+            {
+                ModLogger.LogError("Failed to get GridLayoutGroup from GridLayout object.");
+                return;
+            }
+
+            gridLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            gridLayoutGroup.constraintCount = columnCount;
+        }
+
+        internal static void ResetLayoutElementMinPreferredHeight(GameObject obj)
+        {
+            if (!GetComponent<LayoutElement>(obj, out var layoutElement))
+            {
+                ModLogger.LogError("Failed to get LayoutElement from object.");
+                return;
+            }
+
+            layoutElement.minHeight = -1;
+            layoutElement.preferredHeight = -1;
         }
 
         internal static bool GetComponent<T>(

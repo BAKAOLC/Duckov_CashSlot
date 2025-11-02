@@ -1,6 +1,7 @@
 ﻿using Duckov.UI;
 using HarmonyLib;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Duckov_CashSlot.HarmonyPatches
 {
@@ -26,6 +27,33 @@ namespace Duckov_CashSlot.HarmonyPatches
             var petItemSlotCollectionDisplay =
                 Object.Instantiate(itemSlotCollectionDisplay, petInventoryDisplay.transform);
             petItemSlotCollectionDisplay.name = ModConstant.SlotCollectionDisplayName;
+
+            ResetDisplaySettings(petItemSlotCollectionDisplay);
+        }
+
+        private static void ResetDisplaySettings(ItemSlotCollectionDisplay itemSlotCollectionDisplay)
+        {
+            if (itemSlotCollectionDisplay == null) return;
+
+            if (!Utility.GetComponent(itemSlotCollectionDisplay.gameObject, out LayoutElement layoutElement))
+            {
+                ModLogger.Log("No LayoutElement found on slot collection display.");
+                return;
+            }
+
+            layoutElement.minHeight = -1;
+            layoutElement.preferredHeight = -1;
+
+            var gridLayout = itemSlotCollectionDisplay.transform.Find("GridLayout");
+            if (gridLayout == null) return;
+
+            if (!Utility.GetComponent(gridLayout.gameObject, out GridLayoutGroup gridLayoutGroup))
+            {
+                ModLogger.Log("No GridLayoutGroup found on GridLayout.");
+                return;
+            }
+
+            gridLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
         }
     }
 }

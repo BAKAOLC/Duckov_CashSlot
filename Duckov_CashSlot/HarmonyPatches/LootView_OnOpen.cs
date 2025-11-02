@@ -2,6 +2,7 @@
 using Duckov_CashSlot.Data;
 using Duckov.UI;
 using HarmonyLib;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Duckov_CashSlot.HarmonyPatches
@@ -37,6 +38,8 @@ namespace Duckov_CashSlot.HarmonyPatches
                 petInventoryDisplay.transform.Find(ModConstant.SlotCollectionDisplayName);
             if (petSlotCollectionDisplayTransform == null) return;
 
+            SetContentSizeFitter(petInventoryDisplay);
+
             ModLogger.Log("Setting up slot display in loot view.");
 
             var petSlotCollectionDisplay = petSlotCollectionDisplayTransform.GetComponent<ItemSlotCollectionDisplay>();
@@ -47,19 +50,58 @@ namespace Duckov_CashSlot.HarmonyPatches
             Utility.SetSlotCollectionScrollable(petSlotCollectionDisplay,
                 SlotDisplaySetting.Instance.PetSlotDisplayRows);
 
-            if (!CheckSuperPetEnabled(petInventoryDisplay)) return;
+            var gridLayout = petSlotCollectionDisplayTransform.Find("GridLayout");
+            if (gridLayout)
+                Utility.SetGridLayoutConstraintFixedColumnCount(gridLayout.gameObject,
+                    SlotDisplaySetting.Instance.PetSlotDisplayColumns);
 
-            ModLogger.Log("Super Pet mod detected, adjusting cash slot display.");
+            var petSlotGridLayout = petInventoryDisplay.transform.Find("Container/Layout");
+            if (petSlotGridLayout)
+            {
+                Utility.SetGridLayoutConstraintFixedColumnCount(petSlotGridLayout.gameObject,
+                    SlotDisplaySetting.Instance.PetSlotDisplayColumns);
+                Utility.ResetLayoutElementMinPreferredHeight(petSlotGridLayout.gameObject);
+            }
 
-            petSlotCollectionDisplay.transform.SetSiblingIndex(2);
+            CheckSuperPet(petInventoryDisplay);
         }
 
-        private static bool CheckSuperPetEnabled(InventoryDisplay petInventoryDisplay)
+        private static void SetContentSizeFitter(InventoryDisplay petInventoryDisplay)
         {
+            var contentSizeFitter = petInventoryDisplay.GetComponent<ContentSizeFitter>();
+            if (contentSizeFitter == null) return;
+
+            contentSizeFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            contentSizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            ModLogger.Log("Adjusted ContentSizeFitter for pet inventory display.");
+        }
+
+        private static void CheckSuperPet(InventoryDisplay petInventoryDisplay)
+        {
+            var contentLayoutField = AccessTools.Field(typeof(InventoryDisplay), "contentLayout");
+            if (contentLayoutField == null) return;
+            var contentLayout = contentLayoutField.GetValue(petInventoryDisplay) as GridLayoutGroup;
+            if (contentLayout == null) return;
+
+            var zeroOffset = new RectOffset(0, 0, 0, 0);
+
+            if (contentLayout.padding != zeroOffset)
+            {
+                contentLayout.padding = zeroOffset;
+                ModLogger.Log(
+                    "Reset GridLayoutGroup padding for pet inventory display from probable Super Pet modification.");
+            }
+
             var gridLayoutElementField = AccessTools.Field(typeof(InventoryDisplay), "gridLayoutElement");
-            if (gridLayoutElementField == null) return false;
+            if (gridLayoutElementField == null) return;
             var layoutElement = gridLayoutElementField.GetValue(petInventoryDisplay) as LayoutElement;
-            return layoutElement != null && layoutElement.ignoreLayout;
+            if (layoutElement == null || !layoutElement.ignoreLayout) return;
+            {
+                layoutElement.ignoreLayout = false;
+                ModLogger.Log(
+                    "Reset LayoutElement ignoreLayout for pet inventory display from probable Super Pet modification.");
+            }
         }
     }
     // ReSharper restore InconsistentNaming

@@ -17,9 +17,9 @@ namespace Duckov_CashSlot.Configs
             ToggleKey = KeyCode.Equals;
         }
 
-        public override void Validate()
+        public override bool Validate()
         {
-            // KeyCode validation is handled by Unity
+            return false;
         }
     }
 }

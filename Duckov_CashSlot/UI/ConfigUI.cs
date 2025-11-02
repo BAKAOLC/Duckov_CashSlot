@@ -52,17 +52,13 @@ namespace Duckov_CashSlot.UI
                         break;
                     }
                 }
+
                 return;
             }
 
             if (!Input.GetKeyDown(UIConfig.Instance.ToggleKey)) return;
             _isVisible = !_isVisible;
             if (_isVisible) LoadTempData();
-        }
-
-        private static bool IsMouseButton(KeyCode keyCode)
-        {
-            return keyCode >= KeyCode.Mouse0 && keyCode <= KeyCode.Mouse6;
         }
 
         private void OnDestroy()
@@ -98,6 +94,11 @@ namespace Duckov_CashSlot.UI
             if (currentEvent.type != EventType.Layout && currentEvent.type != EventType.Repaint)
                 if (_windowRect.Contains(currentEvent.mousePosition))
                     currentEvent.Use();
+        }
+
+        private static bool IsMouseButton(KeyCode keyCode)
+        {
+            return keyCode >= KeyCode.Mouse0 && keyCode <= KeyCode.Mouse6;
         }
 
         private void DrawWindow(int windowId)
@@ -168,6 +169,35 @@ namespace Duckov_CashSlot.UI
                     _tempDisplaySetting.PetSlotDisplayRows--;
             if (GUILayout.Button("+", GUILayout.Width(30))) _tempDisplaySetting.PetSlotDisplayRows++;
             GUILayout.EndHorizontal();
+
+            GUILayout.Space(10);
+
+            GUILayout.Label("宠物槽位显示列数", GUI.skin.label);
+            var petColumns = _tempDisplaySetting.PetSlotDisplayColumns;
+            GUILayout.BeginHorizontal();
+            GUILayout.Label($"当前值: {petColumns}", GUILayout.Width(200));
+            if (GUILayout.Button("-", GUILayout.Width(30)))
+                if (petColumns > 1)
+                    _tempDisplaySetting.PetSlotDisplayColumns--;
+            if (GUILayout.Button("+", GUILayout.Width(30))) _tempDisplaySetting.PetSlotDisplayColumns++;
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(10);
+
+            GUILayout.Label("宠物槽位显示列数", GUI.skin.label);
+            var petInventoryColumns = _tempDisplaySetting.PetInventoryDisplayColumns;
+            GUILayout.BeginHorizontal();
+            GUILayout.Label($"当前值: {petInventoryColumns}", GUILayout.Width(200));
+            if (GUILayout.Button("-", GUILayout.Width(30)))
+                if (petInventoryColumns > 1)
+                    _tempDisplaySetting.PetInventoryDisplayColumns--;
+            if (GUILayout.Button("+", GUILayout.Width(30))) _tempDisplaySetting.PetInventoryDisplayColumns++;
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(10);
+
+            _tempDisplaySetting.NewSuperPetDisplayCompact =
+                GUILayout.Toggle(_tempDisplaySetting.NewSuperPetDisplayCompact, "是否启用新版本 Super Pet 显示样式适配");
 
             GUILayout.Space(20);
 

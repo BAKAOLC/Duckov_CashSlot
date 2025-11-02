@@ -22,11 +22,11 @@ namespace Duckov_CashSlot.Configs
             if (!Directory.Exists(ConfigBaseDirectory)) Directory.CreateDirectory(ConfigBaseDirectory);
         }
 
-        public static T LoadConfigFromFile<T>(string configName) where T : ConfigBase
+        public static T LoadConfigFromFile<T>(string configName, bool autoSaveOnLoad = true) where T : ConfigBase
         {
             var configFilePath = Path.Combine(ConfigBaseDirectory, configName);
             var configInstance = Activator.CreateInstance<T>();
-            configInstance.LoadFromFile(configFilePath);
+            configInstance.LoadFromFile(configFilePath, autoSaveOnLoad);
             return configInstance;
         }
 

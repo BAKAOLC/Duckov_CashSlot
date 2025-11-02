@@ -25,7 +25,7 @@ namespace Duckov_CashSlot.Configs
             foreach (var slot in CustomSlots) slot.Validate();
         }
 
-        public override void LoadFromFile(string filePath)
+        public override void LoadFromFile(string filePath, bool autoSaveOnLoad = true)
         {
             try
             {
@@ -35,7 +35,7 @@ namespace Duckov_CashSlot.Configs
                 {
                     ModLogger.LogWarning($"Config file '{filePath}' does not exist. Loading default config.");
                     LoadDefault();
-                    SaveToFile(filePath);
+                    if (autoSaveOnLoad) SaveToFile(filePath);
                     return;
                 }
 
@@ -43,7 +43,7 @@ namespace Duckov_CashSlot.Configs
                 var customSlots = JsonConvert.DeserializeObject<CustomSlot[]>(json, ConfigManager.JsonSettings);
                 CustomSlots = customSlots ?? [];
                 Validate();
-                SaveToFile(filePath);
+                if (autoSaveOnLoad) SaveToFile(filePath);
                 return;
             }
             catch (IOException e)
@@ -61,7 +61,7 @@ namespace Duckov_CashSlot.Configs
 
             ModLogger.LogError("Loading default custom slot configuration due to errors.");
             LoadDefault();
-            SaveToFile(filePath);
+            if (autoSaveOnLoad) SaveToFile(filePath);
         }
 
         public override void SaveToFile(string filePath, bool withBackup = true)

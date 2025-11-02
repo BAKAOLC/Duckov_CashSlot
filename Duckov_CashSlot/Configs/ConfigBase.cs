@@ -11,7 +11,7 @@ namespace Duckov_CashSlot.Configs
 
         public abstract void Validate();
 
-        public virtual void LoadFromFile(string filePath)
+        public virtual void LoadFromFile(string filePath, bool autoSaveOnLoad = true)
         {
             try
             {
@@ -21,20 +21,20 @@ namespace Duckov_CashSlot.Configs
                 {
                     ModLogger.LogWarning($"Config file '{filePath}' does not exist. Loading default config.");
                     LoadDefault();
-                    SaveToFile(filePath);
+                    if (autoSaveOnLoad) SaveToFile(filePath);
                     return;
                 }
 
                 var json = File.ReadAllText(filePath);
                 JsonConvert.PopulateObject(json, this, ConfigManager.JsonSettings);
                 Validate();
-                SaveToFile(filePath);
+                if (autoSaveOnLoad) SaveToFile(filePath);
             }
             catch (Exception ex)
             {
                 ModLogger.LogError($"Failed to load config from file '{filePath}': {ex.Message}");
                 LoadDefault();
-                SaveToFile(filePath);
+                if (autoSaveOnLoad) SaveToFile(filePath);
             }
         }
 

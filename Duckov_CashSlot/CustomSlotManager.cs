@@ -13,7 +13,7 @@ namespace Duckov_CashSlot
 
         public static void Initialize()
         {
-            Reload();
+            Reload(true);
         }
 
         public static void Uninitialize()
@@ -27,11 +27,14 @@ namespace Duckov_CashSlot
             RegisteredCustomSlotKeys.Clear();
         }
 
-        public static void Reload()
+        public static void Reload(bool fromInitialize = false)
         {
             Uninitialize();
 
             LoadConfig();
+
+            if (!fromInitialize)
+                SlotManager.ReorderRegisteredSlotsInProcessedCollections();
         }
 
         private static void LoadConfig()

@@ -11,11 +11,20 @@ namespace Duckov_CashSlot.Configs
 
         public override void LoadDefault()
         {
+            // ReSharper disable All
+            var defaultSlotSetting = new SlotSettings(
+                showIn: ShowIn.Pet,
+                forbidDeathDrop: true,
+                forbidWeightCalculation: true,
+                forbidItemsWithSameID: false,
+                enableModifier: true);
+            // ReSharper restore All
+
             CustomSlots =
             [
-                new("Cash", ["Cash"], new(ShowIn.Pet, true, true)),
-                new("Medic", ["Medic"], new(ShowIn.Pet, true, true)),
-                new("Key", ["Key"], new(ShowIn.Pet, true, true)),
+                new("Cash", ["Cash"], defaultSlotSetting),
+                new("Medic", ["Medic"], defaultSlotSetting),
+                new("Key", ["Key"], defaultSlotSetting),
             ];
         }
 

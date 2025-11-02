@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Duckov_CashSlot.Data;
 using Duckov.Utilities;
 using HarmonyLib;
@@ -15,6 +16,10 @@ namespace Duckov_CashSlot
         public const int InventoryIndexBegin = -100000;
         private static readonly Dictionary<Tag, string> TagLocalizationKeys = new();
         private static readonly Dictionary<string, RegisteredSlot> RegisteredSlots = [];
+        private static readonly HashSet<SlotCollection> ProcessedSlotCollections = [];
+
+        private static readonly FieldInfo ForbidItemsWithSameIDField =
+            AccessTools.Field(typeof(Slot), "forbidItemsWithSameID");
 
         public static bool IsInitialized { get; private set; }
 
@@ -31,6 +36,7 @@ namespace Duckov_CashSlot
         {
             if (!IsInitialized) return;
             RemoveLocalization();
+            ClearProcessedSlotCollections();
             IsInitialized = false;
 
             ModLogger.Log("SlotManager uninitialized.");
@@ -53,6 +59,8 @@ namespace Duckov_CashSlot
             }
 
             RegisteredSlots.Add(key, new(key, requiredTags, settings));
+            AddSlotToProcessedCollections(key);
+
             ModLogger.Log($"""
                            Registered slot with key '{key}'.
                            === Slot Settings ===
@@ -69,13 +77,70 @@ namespace Duckov_CashSlot
                 return;
             }
 
+            RemoveSlotFromProcessedCollections(key);
+
             ModLogger.Log($"Unregistered slot with key '{key}'.");
         }
 
         public static void ClearRegisteredSlots()
         {
+            foreach (var (key, _) in RegisteredSlots) RemoveSlotFromProcessedCollections(key);
             RegisteredSlots.Clear();
             ModLogger.Log("Cleared all registered slots.");
+        }
+
+        public static void ClearProcessedSlotCollections()
+        {
+            foreach (var slotCollection in ProcessedSlotCollections)
+            foreach (var (_, registeredSlot) in RegisteredSlots)
+            {
+                var slot = slotCollection.GetSlot(registeredSlot.Key);
+                if (slot == null) continue;
+                slotCollection.Remove(slot);
+            }
+
+            ProcessedSlotCollections.Clear();
+        }
+
+        public static void AddSlotToProcessedCollections(string key)
+        {
+            if (!RegisteredSlots.TryGetValue(key, out var registeredSlot))
+            {
+                ModLogger.LogError($"No registered slot with key '{key}' found to add to processed collections.");
+                return;
+            }
+
+            foreach (var slotCollection in from slotCollection in ProcessedSlotCollections
+                     where slotCollection != null
+                     let slot = slotCollection.GetSlot(key)
+                     where slot == null
+                     select slotCollection) CreateNewSlotToSlotCollection(slotCollection, registeredSlot);
+        }
+
+        public static void RemoveSlotFromProcessedCollections(string key)
+        {
+            foreach (var slotCollection in ProcessedSlotCollections)
+            {
+                var slot = slotCollection.GetSlot(key);
+                if (slot == null) continue;
+                slotCollection.Remove(slot);
+            }
+        }
+
+        public static void ReorderRegisteredSlotsInProcessedCollections()
+        {
+            if (!IsInitialized)
+            {
+                ModLogger.LogError("SlotManager is not initialized!");
+                return;
+            }
+
+            ModLogger.Log("Reordering registered slots in processed SlotCollections.");
+
+            foreach (var slotCollection in ProcessedSlotCollections)
+                ReorderRegisteredSlotsInSlotCollection(slotCollection);
+
+            ModLogger.Log("Registered slots reordered.");
         }
 
         public static void ApplySlotRegistrations()
@@ -165,6 +230,15 @@ namespace Duckov_CashSlot
                    && registeredSlot.Settings.ForbidWeightCalculation;
         }
 
+        public static bool IsSlotDisableModifiers(Slot slot)
+        {
+            var key = slot.Key;
+            if (!IsInitialized) return false;
+
+            return RegisteredSlots.TryGetValue(key, out var registeredSlot)
+                   && !registeredSlot.Settings.EnableModifier;
+        }
+
         public static int GetSlotInventoryIndex(Slot slot)
         {
             if (!IsInitialized) return -1;
@@ -217,9 +291,18 @@ namespace Duckov_CashSlot
 
         private static void InnerApplySlotRegistrationsToSlotCollection(SlotCollection slotCollection)
         {
+            var processedBefore = ProcessedSlotCollections.Contains(slotCollection);
             if (slotCollection == null)
             {
                 ModLogger.LogError("SlotCollection is null!");
+                if (processedBefore)
+                    ProcessedSlotCollections.Remove(slotCollection!);
+                return;
+            }
+
+            if (processedBefore)
+            {
+                ModLogger.Log("SlotCollection has been processed before. Skipping re-application.");
                 return;
             }
 
@@ -232,15 +315,37 @@ namespace Duckov_CashSlot
                     continue;
                 }
 
-                var slot = new Slot(registeredSlot.Key);
-                slot.requireTags.AddRange(registeredSlot.RequiredTags);
-                var forbidItemsWithSameIDField = AccessTools.Field(typeof(Slot), "forbidItemsWithSameID");
-                forbidItemsWithSameIDField.SetValue(slot, registeredSlot.Settings.ForbidItemsWithSameID);
-
-                slot.Initialize(slotCollection);
-                slotCollection.Add(slot);
+                CreateNewSlotToSlotCollection(slotCollection, registeredSlot);
                 ModLogger.Log($"Added slot with key '{registeredSlot.Key}' to SlotCollection.");
             }
+
+            ProcessedSlotCollections.Add(slotCollection);
+        }
+
+        private static void CreateNewSlotToSlotCollection(SlotCollection slotCollection, RegisteredSlot registeredSlot)
+        {
+            var slot = new Slot(registeredSlot.Key);
+            slot.requireTags.AddRange(registeredSlot.RequiredTags);
+            ForbidItemsWithSameIDField.SetValue(slot, registeredSlot.Settings.ForbidItemsWithSameID);
+            slot.Initialize(slotCollection);
+            slotCollection.Add(slot);
+        }
+
+        private static void ReorderRegisteredSlotsInSlotCollection(SlotCollection slotCollection)
+        {
+            var firstRegisteredSlotIndex = slotCollection.list.FindIndex(slot => RegisteredSlots.ContainsKey(slot.Key));
+            if (firstRegisteredSlotIndex < 0) return;
+
+            var orderedSlots = new List<Slot>();
+            foreach (var (key, _) in RegisteredSlots)
+            {
+                var slot = slotCollection.GetSlot(key);
+                if (slot == null) continue;
+                orderedSlots.Add(slot);
+                slotCollection.Remove(slot);
+            }
+
+            slotCollection.list.InsertRange(firstRegisteredSlotIndex, orderedSlots);
         }
 
         private static void SetupLocalization()

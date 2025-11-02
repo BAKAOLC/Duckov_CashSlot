@@ -6,12 +6,15 @@ namespace Duckov_CashSlot.Data
         ShowIn showIn = ShowIn.Character,
         bool forbidDeathDrop = false,
         bool forbidWeightCalculation = false,
-        bool forbidItemsWithSameID = false)
+        bool forbidItemsWithSameID = false,
+        bool enableModifier = true)
     {
         public ShowIn ShowIn { get; } = showIn;
         public bool ForbidDeathDrop { get; } = forbidDeathDrop;
         public bool ForbidItemsWithSameID { get; } = forbidItemsWithSameID;
         public bool ForbidWeightCalculation { get; } = forbidWeightCalculation;
+
+        public bool EnableModifier { get; } = enableModifier;
 
         public override string ToString()
         {
@@ -19,8 +22,9 @@ namespace Duckov_CashSlot.Data
             stringBuilder.AppendLine($"Show In: {ShowIn}");
             stringBuilder.AppendLine($"Forbid Death Drop: {ForbidDeathDrop}");
             stringBuilder.AppendLine($"Forbid Items With Same ID: {ForbidItemsWithSameID}");
-            stringBuilder.Append($"Forbid Weight Calculation: {ForbidWeightCalculation}");
-            return stringBuilder.ToString();
+            stringBuilder.AppendLine($"Forbid Weight Calculation: {ForbidWeightCalculation}");
+            stringBuilder.AppendLine($"Enable Modifier: {EnableModifier}");
+            return stringBuilder.ToString().TrimEnd();
         }
     }
 }

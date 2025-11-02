@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using System.Collections.Generic;
+using HarmonyLib;
 using ItemStatsSystem;
 using ItemStatsSystem.Items;
 
@@ -8,6 +9,8 @@ namespace Duckov_CashSlot.HarmonyPatches
     // ReSharper disable once InconsistentNaming
     internal static class PatchSlot
     {
+        private static readonly HashSet<Item> DisabledModifierItems = [];
+
         [HarmonyPatch(typeof(Slot), nameof(Slot.Plug))]
         [HarmonyPrefix]
         // ReSharper disable InconsistentNaming
@@ -36,9 +39,10 @@ namespace Duckov_CashSlot.HarmonyPatches
             otherItem.onSetStackCount += OnItemStackCountChanged;
 
             var isSlotForbidDeathDrop = SlotManager.IsSlotForbidDeathDrop(__instance);
-            if (!isSlotForbidDeathDrop) return;
+            if (isSlotForbidDeathDrop) TagManager.SetDontDropOnDeadTag(otherItem);
 
-            TagManager.SetDontDropOnDeadTag(otherItem);
+            var isSlotDisableModifiers = SlotManager.IsSlotDisableModifiers(__instance);
+            if (isSlotDisableModifiers) DisableModifiersForItem(otherItem);
         }
 
         [HarmonyPatch(typeof(Slot), nameof(Slot.Unplug))]
@@ -53,6 +57,8 @@ namespace Duckov_CashSlot.HarmonyPatches
             __result.onSetStackCount -= OnItemStackCountChanged;
 
             TagManager.CheckRemoveDontDropOnDeadTag(__result);
+
+            EnableModifiersForItem(__result);
         }
 
         private static void OnItemStackCountChanged(Item item)
@@ -61,6 +67,23 @@ namespace Duckov_CashSlot.HarmonyPatches
 
             var slot = item.PluggedIntoSlot;
             slot?.ForceInvokeSlotContentChangedEvent();
+        }
+
+        private static void DisableModifiersForItem(Item item)
+        {
+            if (item == null) return;
+            if (item.Modifiers == null) return;
+            item.Modifiers.ModifierEnable = false;
+            DisabledModifierItems.Add(item);
+        }
+
+        private static void EnableModifiersForItem(Item item)
+        {
+            if (item == null) return;
+            if (item.Modifiers == null) return;
+            if (!DisabledModifierItems.Contains(item)) return;
+            item.Modifiers.ModifierEnable = true;
+            DisabledModifierItems.Remove(item);
         }
     }
 }

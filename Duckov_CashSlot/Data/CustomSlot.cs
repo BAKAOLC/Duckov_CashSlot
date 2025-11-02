@@ -38,6 +38,8 @@ namespace Duckov_CashSlot.Data
                 validTags.Add(trimmedTag);
             }
 
+            RequiredTags = validTags.ToArray();
+
             return isChanged;
         }
 

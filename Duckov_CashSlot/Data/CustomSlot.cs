@@ -9,20 +9,36 @@ namespace Duckov_CashSlot.Data
         public string[] RequiredTags { get; private set; } = requiredTags;
         public SlotSettings Settings { get; private set; } = settings;
 
-        public void Validate()
+        public bool Validate()
         {
             Key ??= string.Empty;
             RequiredTags ??= [];
-            if (string.IsNullOrWhiteSpace(Key)) Key = Guid.NewGuid().ToString();
+
+            var isChanged = false;
+
+            if (string.IsNullOrWhiteSpace(Key))
+            {
+                Key = Guid.NewGuid().ToString();
+                isChanged = true;
+            }
+
             var validTags = new List<string>();
             foreach (var tag in RequiredTags)
             {
                 var trimmedTag = tag.Trim();
-                if (string.IsNullOrEmpty(trimmedTag)) continue;
-                if (!TagManager.GetTagByName(trimmedTag)) continue;
-                if (!validTags.Contains(trimmedTag))
-                    validTags.Add(trimmedTag);
+                if (trimmedTag != tag) isChanged = true;
+                if (string.IsNullOrEmpty(trimmedTag) ||
+                    !TagManager.GetTagByName(trimmedTag) ||
+                    validTags.Contains(trimmedTag))
+                {
+                    isChanged = true;
+                    continue;
+                }
+
+                validTags.Add(trimmedTag);
             }
+
+            return isChanged;
         }
     }
 }

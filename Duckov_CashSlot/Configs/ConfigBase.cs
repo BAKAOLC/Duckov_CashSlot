@@ -9,7 +9,7 @@ namespace Duckov_CashSlot.Configs
         // ReSharper disable once MemberCanBeProtected.Global
         public abstract void LoadDefault();
 
-        public abstract void Validate();
+        public abstract bool Validate();
 
         public virtual void LoadFromFile(string filePath, bool autoSaveOnLoad = true)
         {
@@ -27,8 +27,7 @@ namespace Duckov_CashSlot.Configs
 
                 var json = File.ReadAllText(filePath);
                 JsonConvert.PopulateObject(json, this, ConfigManager.JsonSettings);
-                Validate();
-                if (autoSaveOnLoad) SaveToFile(filePath);
+                if (Validate() && autoSaveOnLoad) SaveToFile(filePath);
             }
             catch (Exception ex)
             {

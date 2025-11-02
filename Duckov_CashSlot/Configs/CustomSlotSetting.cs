@@ -19,10 +19,14 @@ namespace Duckov_CashSlot.Configs
             ];
         }
 
-        public override void Validate()
+        public override bool Validate()
         {
+            var isChanged = false;
             CustomSlots ??= [];
-            foreach (var slot in CustomSlots) slot.Validate();
+            foreach (var slot in CustomSlots)
+                if (slot.Validate())
+                    isChanged = true;
+            return isChanged;
         }
 
         public override void LoadFromFile(string filePath, bool autoSaveOnLoad = true)
@@ -42,8 +46,7 @@ namespace Duckov_CashSlot.Configs
                 var json = File.ReadAllText(filePath);
                 var customSlots = JsonConvert.DeserializeObject<CustomSlot[]>(json, ConfigManager.JsonSettings);
                 CustomSlots = customSlots ?? [];
-                Validate();
-                if (autoSaveOnLoad) SaveToFile(filePath);
+                if (Validate() && autoSaveOnLoad) SaveToFile(filePath);
                 return;
             }
             catch (IOException e)

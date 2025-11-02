@@ -194,8 +194,6 @@ namespace Duckov_CashSlot
         {
             if (_gridLayoutGroup == null || _gridRectTransform == null) return Vector2Int.zero;
 
-            LayoutRebuilder.ForceRebuildLayoutImmediate(_gridRectTransform);
-
             var itemCount = _gridRectTransform.childCount;
             if (itemCount == 0) return Vector2Int.zero;
 

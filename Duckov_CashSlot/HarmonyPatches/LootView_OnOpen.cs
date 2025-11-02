@@ -55,15 +55,17 @@ namespace Duckov_CashSlot.HarmonyPatches
                 Utility.SetGridLayoutConstraintFixedColumnCount(gridLayout.gameObject,
                     SlotDisplaySetting.Instance.PetSlotDisplayColumns);
 
-            var petSlotGridLayout = petInventoryDisplay.transform.Find("Container/Layout");
-            if (petSlotGridLayout)
+            if (IsSuperModPatched())
             {
-                Utility.SetGridLayoutConstraintFixedColumnCount(petSlotGridLayout.gameObject,
-                    SlotDisplaySetting.Instance.PetSlotDisplayColumns);
-                Utility.ResetLayoutElementMinPreferredHeight(petSlotGridLayout.gameObject);
+                CheckSuperPet(petInventoryDisplay, petSlotCollectionDisplay);
+                return;
             }
 
-            CheckSuperPet(petInventoryDisplay, petSlotCollectionDisplay);
+            var petSlotGridLayout = petInventoryDisplay.transform.Find("Container/Layout");
+            if (!petSlotGridLayout) return;
+            Utility.SetGridLayoutConstraintFixedColumnCount(petSlotGridLayout.gameObject,
+                SlotDisplaySetting.Instance.PetInventoryDisplayColumns);
+            Utility.ResetLayoutElementMinPreferredHeight(petSlotGridLayout.gameObject);
         }
 
         private static void SetContentSizeFitter(InventoryDisplay petInventoryDisplay)
@@ -122,6 +124,12 @@ namespace Duckov_CashSlot.HarmonyPatches
 
             petSlotCollectionDisplay.transform.SetSiblingIndex(2);
             ModLogger.Log("Using old Super Pet adjustment for pet inventory display.");
+        }
+
+        private static bool IsSuperModPatched()
+        {
+            return Harmony.HasAnyPatches(ModConstant.SuperPetModID) ||
+                   Harmony.HasAnyPatches(ModConstant.MergeMyModID);
         }
     }
     // ReSharper restore InconsistentNaming

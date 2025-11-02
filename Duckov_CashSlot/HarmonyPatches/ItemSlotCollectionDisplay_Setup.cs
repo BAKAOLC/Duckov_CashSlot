@@ -14,12 +14,32 @@ namespace Duckov_CashSlot.HarmonyPatches
         internal static ShowIn CurrentShowIn = ShowIn.Character;
         private static readonly Dictionary<Item, Slot[]> CachedSlots = [];
 
+        private static Item? MainCharacterItem
+        {
+            get
+            {
+                if (!LevelManager.Instance) return null;
+                return !LevelManager.Instance.MainCharacter
+                    ? null
+                    : LevelManager.Instance.MainCharacter.CharacterItem;
+            }
+        }
+
         private static void Prefix(ref Item target)
         {
             if (target == null || target.Slots == null) return;
+            if (!IsMainCharacterItem(target)) return;
 
             CachedSlots[target] = [..target.Slots];
             RemoveInvisibleSlots(target, CurrentShowIn);
+        }
+
+        private static bool IsMainCharacterItem(Item item)
+        {
+            if (item == null) return false;
+            if (!item.IsCharacter) return false;
+            var mainCharacterItem = MainCharacterItem;
+            return mainCharacterItem != null && mainCharacterItem == item;
         }
 
         private static void RemoveInvisibleSlots(Item target, ShowIn showIn)

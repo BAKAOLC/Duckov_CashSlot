@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Duckov.Utilities;
 using ItemStatsSystem;
@@ -9,6 +10,8 @@ namespace Duckov_CashSlot
     {
         private static readonly HashSet<Item> TrackedItems = [];
         private static Tag DontDropOnDeadTag => GameplayDataSettings.Tags.DontDropOnDeadInSlot;
+
+        public static ReadOnlyCollection<Tag> AllTags => GameplayDataSettings.Tags.AllTags;
 
         public static Tag? GetTagByName(string tagName)
         {

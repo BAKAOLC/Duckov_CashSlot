@@ -50,7 +50,11 @@ namespace Duckov_CashSlot
                     continue;
                 }
 
-                SlotManager.RegisterSlot(customSlot.Key, GetTagsByNames(customSlot.RequiredTags), customSlot.Settings);
+                SlotManager.RegisterSlot(
+                    customSlot.Key,
+                    GetTagsByNames(customSlot.RequiredTags),
+                    GetTagsByNames(customSlot.ExcludedTags),
+                    customSlot.Settings);
                 RegisteredCustomSlotKeys.Add(customSlot.Key);
                 ModLogger.Log($"Registered custom slot with key '{customSlot.Key}'.");
             }

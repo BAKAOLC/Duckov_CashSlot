@@ -22,9 +22,9 @@ namespace Duckov_CashSlot.Configs
 
             CustomSlots =
             [
-                new("Cash", ["Cash"], defaultSlotSetting),
-                new("Medic", ["Medic"], defaultSlotSetting),
-                new("Key", ["Key"], defaultSlotSetting),
+                new("Cash", ["Cash"], [], defaultSlotSetting),
+                new("Medic", ["Medic"], [], defaultSlotSetting),
+                new("Key", ["Key"], [], defaultSlotSetting),
             ];
         }
 

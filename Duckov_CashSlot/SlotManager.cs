@@ -50,7 +50,7 @@ namespace Duckov_CashSlot
             return false;
         }
 
-        public static void RegisterSlot(string key, Tag[] requiredTags, SlotSettings settings)
+        public static void RegisterSlot(string key, Tag[] requiredTags, Tag[] excludedTags, SlotSettings settings)
         {
             if (RegisteredSlots.TryGetValue(key, out _))
             {
@@ -58,7 +58,7 @@ namespace Duckov_CashSlot
                 RegisteredSlots.Remove(key);
             }
 
-            RegisteredSlots.Add(key, new(key, requiredTags, settings));
+            RegisteredSlots.Add(key, new(key, requiredTags, excludedTags, settings));
             AddSlotToProcessedCollections(key);
 
             ModLogger.Log($"""
@@ -326,6 +326,7 @@ namespace Duckov_CashSlot
         {
             var slot = new Slot(registeredSlot.Key);
             slot.requireTags.AddRange(registeredSlot.RequiredTags);
+            slot.excludeTags.AddRange(registeredSlot.ExcludedTags);
             ForbidItemsWithSameIDField.SetValue(slot, registeredSlot.Settings.ForbidItemsWithSameID);
             slot.Initialize(slotCollection);
             slotCollection.Add(slot);

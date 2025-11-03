@@ -16,11 +16,17 @@ namespace Duckov_CashSlot.UI
         private readonly Dictionary<int, CustomSlotEditingData> _slotBackups = [];
         private int _currentTab;
         private bool _detectingKey;
+        private bool _excludedTagsExpanded;
         private bool _isVisible;
+        private int _openTagDropdownKey = -1;
         private CustomSlotSetting? _originalConfig;
+
+        private bool _requiredTagsExpanded;
         private int _selectedSlotIndex = -1;
         private Vector2 _slotScrollPosition;
+        private Vector2 _tagDropdownScrollPosition;
         private Vector2 _tagScrollPosition;
+        private string _tagSearchText = "";
         private List<CustomSlotEditingData>? _tempCustomSlots;
 
         private SlotDisplaySetting? _tempDisplaySetting;
@@ -67,6 +73,11 @@ namespace Duckov_CashSlot.UI
             _tempCustomSlots?.Clear();
             _slotBackups.Clear();
             _positionInputs.Clear();
+            _openTagDropdownKey = -1;
+            _tagDropdownScrollPosition = Vector2.zero;
+            _tagSearchText = "";
+            _requiredTagsExpanded = false;
+            _excludedTagsExpanded = false;
             _tempDisplaySetting = null;
             _originalConfig = null;
             _detectingKey = false;
@@ -98,7 +109,8 @@ namespace Duckov_CashSlot.UI
 
         private static bool IsMouseButton(KeyCode keyCode)
         {
-            return keyCode >= KeyCode.Mouse0 && keyCode <= KeyCode.Mouse6;
+            if (keyCode < KeyCode.Mouse0) return false;
+            return keyCode <= KeyCode.Mouse6;
         }
 
         private void DrawWindow(int windowId)
@@ -302,7 +314,10 @@ namespace Duckov_CashSlot.UI
             var buttonStyle = new GUIStyle(GUI.skin.button);
             if (isSelected) buttonStyle.normal = buttonStyle.active;
             if (GUILayout.Button(slot.Key, buttonStyle, GUILayout.ExpandWidth(true)))
+            {
+                CloseTagDropdown();
                 _selectedSlotIndex = isSelected ? -1 : index;
+            }
 
             GUILayout.EndHorizontal();
 
@@ -359,12 +374,223 @@ namespace Duckov_CashSlot.UI
             {
                 Key = source.Key,
                 RequiredTags = [..source.RequiredTags],
+                ExcludedTags = [..source.ExcludedTags],
                 ShowIn = source.ShowIn,
                 ForbidDeathDrop = source.ForbidDeathDrop,
                 ForbidWeightCalculation = source.ForbidWeightCalculation,
                 ForbidItemsWithSameID = source.ForbidItemsWithSameID,
                 DisableModifier = source.DisableModifier,
             };
+        }
+
+        private void DrawTagSelector(List<string> tags, int tagIndex, bool isRequired)
+        {
+            var tagTypeOffset = isRequired ? 0 : 10000;
+            var dropdownKey = _selectedSlotIndex * 1000 + tagTypeOffset + tagIndex;
+
+            GUILayout.BeginHorizontal();
+
+            var currentTag = tags[tagIndex];
+            var allTags = TagManager.AllTags;
+
+            var isValidTag = !string.IsNullOrEmpty(currentTag) && allTags.Any(t => t.name == currentTag);
+            var displayName = string.IsNullOrEmpty(currentTag) ? "选择标签..." : GetTagDisplayName(currentTag);
+
+            var mainButtonStyle = new GUIStyle(GUI.skin.button);
+            if (!string.IsNullOrEmpty(currentTag) && !isValidTag)
+            {
+                mainButtonStyle.normal.textColor = Color.red;
+                displayName = $"[无效] {currentTag}";
+            }
+
+            if (GUILayout.Button(displayName, mainButtonStyle, GUILayout.ExpandWidth(true)))
+            {
+                if (_openTagDropdownKey == dropdownKey)
+                {
+                    CloseTagDropdown();
+                }
+                else
+                {
+                    _openTagDropdownKey = dropdownKey;
+                    _tagSearchText = "";
+                }
+            }
+
+            if (GUILayout.Button("删除", GUILayout.Width(60)))
+            {
+                tags.RemoveAt(tagIndex);
+                if (_openTagDropdownKey == dropdownKey) CloseTagDropdown();
+                return;
+            }
+
+            GUILayout.EndHorizontal();
+
+            if (_openTagDropdownKey != dropdownKey) return;
+            GUILayout.BeginVertical("box");
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("搜索:", GUILayout.Width(40));
+            _tagSearchText = GUILayout.TextField(_tagSearchText);
+
+            if (GUILayout.Button("清空", GUILayout.Width(40))) _tagSearchText = "";
+            GUILayout.EndHorizontal();
+
+            var filteredTags = allTags.Where(filteredTag =>
+                string.IsNullOrEmpty(_tagSearchText) ||
+                filteredTag.name.IndexOf(_tagSearchText, StringComparison.OrdinalIgnoreCase) >= 0
+            ).ToList();
+
+            _tagDropdownScrollPosition = GUILayout.BeginScrollView(
+                _tagDropdownScrollPosition,
+                GUILayout.Height(150));
+
+            if (filteredTags.Count == 0)
+                GUILayout.Label("未找到匹配的标签", GUI.skin.label);
+            else
+                foreach (var filteredTag in filteredTags)
+                {
+                    var tagDisplayName = GetTagDisplayName(filteredTag.name);
+                    var isCurrentTag = currentTag == filteredTag.name;
+
+                    var dropdownButtonStyle = new GUIStyle(GUI.skin.button);
+                    if (isCurrentTag)
+                    {
+                        dropdownButtonStyle.normal.textColor = Color.green;
+                        dropdownButtonStyle.fontStyle = FontStyle.Bold;
+                    }
+
+                    if (!GUILayout.Button(tagDisplayName, dropdownButtonStyle, GUILayout.ExpandWidth(true))) continue;
+                    tags[tagIndex] = filteredTag.name;
+                    CloseTagDropdown();
+                }
+
+            GUILayout.EndScrollView();
+
+            if (GUILayout.Button("关闭", GUILayout.Height(25))) CloseTagDropdown();
+
+            GUILayout.EndVertical();
+        }
+
+        private static string GetTagDisplayName(string tagName)
+        {
+            if (string.IsNullOrEmpty(tagName)) return "未选择";
+
+            var tag = TagManager.GetTagByName(tagName);
+            return tag != null ? $"{tag.DisplayName} ({tag.name})" : tagName;
+        }
+
+        private void CloseTagDropdown()
+        {
+            _openTagDropdownKey = -1;
+            _tagSearchText = "";
+        }
+
+        private void DrawTagSection(string title, List<string> tags, ref bool isExpanded, bool isRequired)
+        {
+            var expandButtonText = isExpanded ? "▼" : "▶";
+            var tagCountText = tags.Count > 0 ? $" ({tags.Count})" : "";
+            var fullTitle = $"{expandButtonText} {title}{tagCountText}";
+
+            if (GUILayout.Button(fullTitle, GUILayout.Height(25)))
+            {
+                if (isExpanded)
+                {
+                    isExpanded = false;
+                }
+                else
+                {
+                    _requiredTagsExpanded = false;
+                    _excludedTagsExpanded = false;
+                    isExpanded = true;
+                }
+
+                CloseTagDropdown();
+            }
+
+            if (!isExpanded) return;
+            GUILayout.BeginVertical("box");
+
+            _tagScrollPosition = GUILayout.BeginScrollView(_tagScrollPosition, GUILayout.Height(280));
+
+            if (tags.Count == 0)
+            {
+                GUILayout.BeginVertical("box");
+                GUILayout.Label("当前列表为空", GUI.skin.label);
+                GUILayout.Space(5);
+                var descriptionStyle = new GUIStyle(GUI.skin.label)
+                {
+                    fontSize = 11,
+                    normal = { textColor = Color.gray },
+                    wordWrap = true,
+                };
+
+                var emptyDescription = isRequired
+                    ? "名称将显示为 \"?\" 但是允许放置任何物品"
+                    : "不会排除任何物品";
+                GUILayout.Label(emptyDescription, descriptionStyle);
+                GUILayout.EndVertical();
+            }
+            else
+            {
+                for (var i = 0; i < tags.Count; i++) DrawTagSelector(tags, i, isRequired);
+            }
+
+            GUILayout.EndScrollView();
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("添加标签"))
+            {
+                tags.Add("");
+
+                var newTagIndex = tags.Count - 1;
+                var tagTypeOffset = isRequired ? 0 : 10000;
+                var newDropdownKey = _selectedSlotIndex * 1000 + tagTypeOffset + newTagIndex;
+                _openTagDropdownKey = newDropdownKey;
+                _tagSearchText = "";
+            }
+
+            if (GUILayout.Button("清理无效标签"))
+            {
+                var originalCount = tags.Count;
+                var validTags = ValidateAndCleanTags(tags);
+                tags.Clear();
+                tags.AddRange(validTags);
+                var removedCount = originalCount - tags.Count;
+                var tagTypeName = isRequired ? "必需" : "排除";
+                ModLogger.Log(removedCount > 0
+                    ? $"已从{tagTypeName}标签清理 {removedCount} 个无效标签"
+                    : $"{tagTypeName}标签没有无效标签需要清理");
+            }
+
+            GUILayout.EndHorizontal();
+
+            GUILayout.EndVertical();
+        }
+
+        private static List<string> ValidateAndCleanTags(List<string> tags)
+        {
+            var allTags = TagManager.AllTags;
+            var validTags = new List<string>();
+            var removedTags = new List<string>();
+
+            foreach (var tagName in tags)
+            {
+                if (string.IsNullOrEmpty(tagName))
+                {
+                    removedTags.Add("空标签");
+                    continue;
+                }
+
+                var tag = allTags.FirstOrDefault(t => t.name == tagName);
+                if (tag != null)
+                    validTags.Add(tagName);
+                else
+                    removedTags.Add(tagName);
+            }
+
+            if (removedTags.Count > 0) ModLogger.LogWarning($"已清理无效标签: {string.Join(", ", removedTags)}");
+
+            return validTags;
         }
 
         private void DrawSlotConfigDetails(CustomSlotEditingData slot, int index)
@@ -380,25 +606,11 @@ namespace Duckov_CashSlot.UI
 
             GUILayout.Space(5);
 
-            GUILayout.Label("标签列表:", GUI.skin.label);
-            _tagScrollPosition = GUILayout.BeginScrollView(_tagScrollPosition, GUILayout.Height(150));
+            DrawTagSection("必需标签", slot.RequiredTags, ref _requiredTagsExpanded, true);
 
-            for (var i = 0; i < slot.RequiredTags.Count; i++)
-            {
-                GUILayout.BeginHorizontal();
-                slot.RequiredTags[i] = GUILayout.TextField(slot.RequiredTags[i]);
-                if (GUILayout.Button("删除", GUILayout.Width(60)))
-                {
-                    slot.RequiredTags.RemoveAt(i);
-                    i--;
-                }
+            GUILayout.Space(5);
 
-                GUILayout.EndHorizontal();
-            }
-
-            GUILayout.EndScrollView();
-
-            if (GUILayout.Button("添加标签")) slot.RequiredTags.Add("");
+            DrawTagSection("排除标签", slot.ExcludedTags, ref _excludedTagsExpanded, false);
 
             GUILayout.Space(10);
 
@@ -425,10 +637,12 @@ namespace Duckov_CashSlot.UI
                     var backup = _slotBackups[index];
                     slot.Key = backup.Key;
                     slot.RequiredTags = new(backup.RequiredTags);
+                    slot.ExcludedTags = new(backup.ExcludedTags);
                     slot.ShowIn = backup.ShowIn;
                     slot.ForbidDeathDrop = backup.ForbidDeathDrop;
                     slot.ForbidWeightCalculation = backup.ForbidWeightCalculation;
                     slot.ForbidItemsWithSameID = backup.ForbidItemsWithSameID;
+                    slot.DisableModifier = backup.DisableModifier;
                     _slotBackups.Remove(index);
                 }
 
@@ -454,7 +668,8 @@ namespace Duckov_CashSlot.UI
             _tempCustomSlots = _originalConfig.CustomSlots.Select(slot => new CustomSlotEditingData
             {
                 Key = slot.Key,
-                RequiredTags = [..slot.RequiredTags],
+                RequiredTags = ValidateAndCleanTags([..slot.RequiredTags]),
+                ExcludedTags = ValidateAndCleanTags([..slot.ExcludedTags]),
                 ShowIn = slot.Settings.ShowIn,
                 ForbidDeathDrop = slot.Settings.ForbidDeathDrop,
                 ForbidWeightCalculation = slot.Settings.ForbidWeightCalculation,
@@ -472,7 +687,8 @@ namespace Duckov_CashSlot.UI
             _tempCustomSlots = _originalConfig.CustomSlots.Select(slot => new CustomSlotEditingData
             {
                 Key = slot.Key,
-                RequiredTags = [..slot.RequiredTags],
+                RequiredTags = ValidateAndCleanTags([..slot.RequiredTags]),
+                ExcludedTags = ValidateAndCleanTags([..slot.ExcludedTags]),
                 ShowIn = slot.Settings.ShowIn,
                 ForbidDeathDrop = slot.Settings.ForbidDeathDrop,
                 ForbidWeightCalculation = slot.Settings.ForbidWeightCalculation,
@@ -510,9 +726,16 @@ namespace Duckov_CashSlot.UI
         {
             if (_tempCustomSlots == null || _originalConfig == null) return;
 
+            foreach (var slot in _tempCustomSlots)
+            {
+                slot.RequiredTags = ValidateAndCleanTags(slot.RequiredTags);
+                slot.ExcludedTags = ValidateAndCleanTags(slot.ExcludedTags);
+            }
+
             var customSlots = _tempCustomSlots.Select(slot => new CustomSlot(
                 slot.Key,
                 slot.RequiredTags.ToArray(),
+                slot.ExcludedTags.ToArray(),
                 new(
                     slot.ShowIn,
                     slot.ForbidDeathDrop,
@@ -539,7 +762,8 @@ namespace Duckov_CashSlot.UI
             _tempCustomSlots = defaultConfig.CustomSlots.Select(slot => new CustomSlotEditingData
             {
                 Key = slot.Key,
-                RequiredTags = [..slot.RequiredTags],
+                RequiredTags = ValidateAndCleanTags([..slot.RequiredTags]),
+                ExcludedTags = ValidateAndCleanTags([..slot.ExcludedTags]),
                 ShowIn = slot.Settings.ShowIn,
                 ForbidDeathDrop = slot.Settings.ForbidDeathDrop,
                 ForbidWeightCalculation = slot.Settings.ForbidWeightCalculation,
@@ -555,7 +779,8 @@ namespace Duckov_CashSlot.UI
             _tempCustomSlots.Add(new()
             {
                 Key = $"NewSlot_{Guid.NewGuid().ToString()[..8]}",
-                RequiredTags = [""],
+                RequiredTags = [],
+                ExcludedTags = [],
                 ShowIn = ShowIn.Character,
                 ForbidDeathDrop = false,
                 ForbidWeightCalculation = false,
@@ -570,6 +795,7 @@ namespace Duckov_CashSlot.UI
         {
             public string Key { get; set; } = string.Empty;
             public List<string> RequiredTags { get; set; } = [];
+            public List<string> ExcludedTags { get; set; } = [];
             public ShowIn ShowIn { get; set; } = ShowIn.Character;
             public bool ForbidDeathDrop { get; set; }
             public bool ForbidWeightCalculation { get; set; }

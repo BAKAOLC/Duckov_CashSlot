@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Duckov_CashSlot
@@ -10,6 +11,8 @@ namespace Duckov_CashSlot
         private GridLayoutGroup _gridLayoutGroup = null!;
         private RectTransform _gridRectTransform = null!;
         private LayoutElement _layoutElement = null!;
+
+        private bool _needToUpdateHeight;
         private ScrollRect _scrollRect = null!;
         private RectTransform _viewport = null!;
 
@@ -24,15 +27,22 @@ namespace Duckov_CashSlot
             InitComponents();
         }
 
+        private void LateUpdate()
+        {
+            if (!_needToUpdateHeight) return;
+            _needToUpdateHeight = false;
+            UniTask.DelayFrame(1).ContinueWith(UpdateHeight).Forget();
+        }
+
         private void OnTransformChildrenChanged()
         {
-            UpdateHeight();
+            _needToUpdateHeight = true;
         }
 
         public void SetMaxRows(int rows)
         {
             maxRows = rows;
-            UpdateHeight();
+            _needToUpdateHeight = true;
         }
 
         private void InitComponents()
@@ -43,7 +53,7 @@ namespace Duckov_CashSlot
             if (!InitGridLayoutGroup()) return;
             if (!InitializeScrollRect()) return;
 
-            UpdateHeight();
+            _needToUpdateHeight = true;
         }
 
         private bool CheckRectTransform()

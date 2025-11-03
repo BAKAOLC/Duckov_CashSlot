@@ -127,22 +127,6 @@ namespace Duckov_CashSlot
             }
         }
 
-        public static void ReorderRegisteredSlotsInProcessedCollections()
-        {
-            if (!IsInitialized)
-            {
-                ModLogger.LogError("SlotManager is not initialized!");
-                return;
-            }
-
-            ModLogger.Log("Reordering registered slots in processed SlotCollections.");
-
-            foreach (var slotCollection in ProcessedSlotCollections)
-                ReorderRegisteredSlotsInSlotCollection(slotCollection);
-
-            ModLogger.Log("Registered slots reordered.");
-        }
-
         public static void ApplySlotRegistrations()
         {
             if (!IsInitialized)
@@ -330,23 +314,6 @@ namespace Duckov_CashSlot
             ForbidItemsWithSameIDField.SetValue(slot, registeredSlot.Settings.ForbidItemsWithSameID);
             slot.Initialize(slotCollection);
             slotCollection.Add(slot);
-        }
-
-        private static void ReorderRegisteredSlotsInSlotCollection(SlotCollection slotCollection)
-        {
-            var firstRegisteredSlotIndex = slotCollection.list.FindIndex(slot => RegisteredSlots.ContainsKey(slot.Key));
-            if (firstRegisteredSlotIndex < 0) return;
-
-            var orderedSlots = new List<Slot>();
-            foreach (var (key, _) in RegisteredSlots)
-            {
-                var slot = slotCollection.GetSlot(key);
-                if (slot == null) continue;
-                orderedSlots.Add(slot);
-                slotCollection.Remove(slot);
-            }
-
-            slotCollection.list.InsertRange(firstRegisteredSlotIndex, orderedSlots);
         }
 
         private static void SetupLocalization()

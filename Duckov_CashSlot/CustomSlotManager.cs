@@ -32,9 +32,6 @@ namespace Duckov_CashSlot
             Uninitialize();
 
             LoadConfig();
-
-            if (!fromInitialize)
-                SlotManager.ReorderRegisteredSlotsInProcessedCollections();
         }
 
         private static void LoadConfig()

@@ -179,6 +179,10 @@ namespace Duckov_CashSlot.UI
                 DrawQuantityConfig("宠物侧背包列表显示列数", _tempDisplaySetting.PetInventoryDisplayColumns);
 
             GUILayout.Space(10);
+            
+            _tempDisplaySetting.PetSlotDisplayAboveInventory =
+                GUILayout.Toggle(_tempDisplaySetting.PetSlotDisplayAboveInventory,
+                    "是否将宠物侧槽位列表显示在宠物背包列表上方");
 
             _tempDisplaySetting.NewSuperPetDisplayCompact =
                 GUILayout.Toggle(_tempDisplaySetting.NewSuperPetDisplayCompact,

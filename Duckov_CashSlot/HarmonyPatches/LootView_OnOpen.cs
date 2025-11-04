@@ -54,6 +54,9 @@ namespace Duckov_CashSlot.HarmonyPatches
             if (gridLayout)
                 Utility.SetGridLayoutConstraintFixedColumnCount(gridLayout.gameObject,
                     SlotDisplaySetting.Instance.PetSlotDisplayColumns);
+            
+            var siblingIndex = SlotDisplaySetting.Instance.PetSlotDisplayAboveInventory ? 2 : 3;
+                petSlotCollectionDisplay.transform.SetSiblingIndex(siblingIndex);
 
             var allowModifyOtherModDisplay = SlotDisplaySetting.Instance.AllowModifyOtherModPetDisplay;
             if (IsSuperModPatched())
@@ -131,7 +134,6 @@ namespace Duckov_CashSlot.HarmonyPatches
             if (!(layoutElement != null && layoutElement.ignoreLayout)) return;
 
             petSlotCollectionDisplay.transform.SetSiblingIndex(2);
-            ModLogger.Log("Using old Super Pet adjustment for pet inventory display.");
         }
 
         private static bool IsSuperModPatched()

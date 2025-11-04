@@ -12,31 +12,21 @@ namespace Duckov_CashSlot.HarmonyPatches
     internal static class PatchSlot
     {
         private static readonly HashSet<Item> DisabledModifierItems = [];
-        private static Tag? _keyTag;
 
-        [HarmonyPatch(typeof(Slot), "CheckAbleToPlug")]
-        [HarmonyPostfix]
+        [HarmonyPatch(typeof(Slot), nameof(Slot.Plug))]
+        [HarmonyPrefix]
         // ReSharper disable InconsistentNaming
-        private static void CheckAbleToPlug_Postfix(Slot __instance, ref Item otherItem, ref bool __result)
+        private static bool Plug_Prefix(Slot __instance, ref bool __result, ref Item otherItem)
             // ReSharper restore InconsistentNaming
         {
-            if (__result) return;
-            if (otherItem == null) return;
-            if (otherItem.TypeID != ModConstant.KeyRingTypeID) return;
-            if (!SlotManager.IsRegisteredSlot(__instance)) return;
+            if (otherItem == null) return true;
+            if (otherItem.TypeID != ModConstant.KeyRingTypeID) return true;
+            if (SlotManager.IsRegisteredSlot(__instance)) return true;
 
-            _keyTag ??= TagManager.GetTagByName("Key");
-            if (_keyTag == null) return;
-
-            foreach (var tag in __instance.requireTags)
-                if (tag != _keyTag && !otherItem.Tags.Contains(tag))
-                    return;
-
-            foreach (var tag in __instance.excludeTags)
-                if (otherItem.Tags.Contains(tag))
-                    return;
-
-            __result = true;
+            ModLogger.Log(
+                $"Prevented plugging Key Ring item '{otherItem.DisplayName}' into unregistered slot '{__instance.Key}'.");
+            __result = false;
+            return false;
         }
 
         [HarmonyPatch(typeof(Slot), nameof(Slot.Plug))]

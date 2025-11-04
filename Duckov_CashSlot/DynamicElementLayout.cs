@@ -147,6 +147,7 @@ namespace Duckov_CashSlot
 
         private void UpdateHeight()
         {
+            if (this == null) return;
             if (_gridLayoutGroup == null || _layoutElement == null || _gridRectTransform == null) return;
 
             var childCount = _gridRectTransform.childCount;

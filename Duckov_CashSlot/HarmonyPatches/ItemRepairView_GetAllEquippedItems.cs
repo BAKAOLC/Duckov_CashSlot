@@ -15,7 +15,7 @@ namespace Duckov_CashSlot.HarmonyPatches
         {
             var excludedItems = __result
                 .Select(item => item.PluggedIntoSlot)
-                .Where(slot => slot != null && SlotManager.IsRegisteredSlot(slot))
+                .Where(slot => slot != null && SlotManager.IsRegisteredSlot(slot, false))
                 .Select(slot => slot.Content)
                 .ToArray();
 

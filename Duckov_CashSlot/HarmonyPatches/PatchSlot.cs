@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Reflection;
-using Duckov.MasterKeys.UI;
+using Duckov.Utilities;
 using HarmonyLib;
 using ItemStatsSystem;
 using ItemStatsSystem.Items;
@@ -12,9 +11,7 @@ namespace Duckov_CashSlot.HarmonyPatches
     internal static class PatchSlot
     {
         private static readonly HashSet<Item> DisabledModifierItems = [];
-
-        private static readonly PropertyInfo MasterKeysRegisterViewKeySlot =
-            AccessTools.Property(typeof(MasterKeysRegisterView), "KeySlot");
+        private static Tag? _keyTag;
 
         [HarmonyPatch(typeof(Slot), "CheckAbleToPlug")]
         [HarmonyPostfix]
@@ -22,17 +19,23 @@ namespace Duckov_CashSlot.HarmonyPatches
         private static void CheckAbleToPlug_Postfix(Slot __instance, ref Item otherItem, ref bool __result)
             // ReSharper restore InconsistentNaming
         {
-            if (!__result) return;
+            if (__result) return;
             if (otherItem == null) return;
             if (otherItem.TypeID != ModConstant.KeyRingTypeID) return;
+            if (!SlotManager.IsRegisteredSlot(__instance)) return;
 
-            var isKeyRingItem = __instance.Master != null && __instance.Master.TypeID == ModConstant.KeyRingTypeID;
-            var masterKeysRegisterViewKeySlot =
-                (Slot)MasterKeysRegisterViewKeySlot.GetValue(MasterKeysRegisterView.Instance);
-            var isMasterKeysRegisterSlot = __instance == masterKeysRegisterViewKeySlot;
+            _keyTag ??= TagManager.GetTagByName("Key");
+            if (_keyTag == null) return;
 
-            if (!isKeyRingItem && !isMasterKeysRegisterSlot) return;
-            __result = false;
+            foreach (var tag in __instance.requireTags)
+                if (tag != _keyTag && !otherItem.Tags.Contains(tag))
+                    return;
+
+            foreach (var tag in __instance.excludeTags)
+                if (otherItem.Tags.Contains(tag))
+                    return;
+
+            __result = true;
         }
 
         [HarmonyPatch(typeof(Slot), nameof(Slot.Plug))]

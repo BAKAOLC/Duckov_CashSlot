@@ -21,6 +21,17 @@ namespace Duckov_CashSlot
         private static readonly FieldInfo ForbidItemsWithSameIDField =
             AccessTools.Field(typeof(Slot), "forbidItemsWithSameID");
 
+        private static Item? MainCharacterItem
+        {
+            get
+            {
+                if (!LevelManager.Instance) return null;
+                return !LevelManager.Instance.MainCharacter
+                    ? null
+                    : LevelManager.Instance.MainCharacter.CharacterItem;
+            }
+        }
+
         public static bool IsInitialized { get; private set; }
 
         public static void Initialize()
@@ -170,8 +181,14 @@ namespace Duckov_CashSlot
             return [];
         }
 
-        public static bool IsRegisteredSlot(Slot slot)
+        public static bool IsRegisteredSlot(Slot slot, bool checkMaster = true)
         {
+            if (checkMaster)
+            {
+                if (slot.Master == null) return false;
+                if (slot.Master != MainCharacterItem) return false;
+            }
+
             var key = slot.Key;
             return IsInitialized && RegisteredSlots.ContainsKey(key);
         }

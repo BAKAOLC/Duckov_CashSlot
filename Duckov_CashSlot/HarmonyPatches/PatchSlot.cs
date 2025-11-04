@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Reflection;
 using Duckov.Utilities;
 using HarmonyLib;
 using ItemStatsSystem;
@@ -95,6 +96,27 @@ namespace Duckov_CashSlot.HarmonyPatches
             if (!DisabledModifierItems.Contains(item)) return;
             item.Modifiers.ModifierEnable = true;
             DisabledModifierItems.Remove(item);
+        }
+
+        [HarmonyPatch]
+        internal static class PatchDisplayName
+        {
+            private static MethodBase TargetMethod()
+            {
+                return AccessTools.PropertyGetter(typeof(Slot), nameof(Slot.DisplayName));
+            }
+
+            // ReSharper disable InconsistentNaming
+            private static void Postfix(Slot __instance, ref string __result)
+                // ReSharper restore InconsistentNaming
+            {
+                if (!SlotManager.IsRegisteredSlot(__instance)) return;
+
+                var slotName = SlotManager.GetSlotName(__instance);
+                if (string.IsNullOrEmpty(slotName)) return;
+
+                __result = slotName;
+            }
         }
     }
 }

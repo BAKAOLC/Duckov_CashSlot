@@ -220,6 +220,16 @@ namespace Duckov_CashSlot
                 ? registeredSlot.Settings
                 : null;
         }
+        
+        public static string? GetSlotName(Slot slot)
+        {
+            var key = slot.Key;
+            if (!IsInitialized) return null;
+
+            return RegisteredSlots.TryGetValue(key, out var registeredSlot)
+                ? registeredSlot.Settings.Name
+                : null;
+        }
 
         public static ShowIn GetSlotShowIn(Slot slot)
         {

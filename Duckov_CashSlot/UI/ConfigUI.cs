@@ -328,7 +328,12 @@ namespace Duckov_CashSlot.UI
 
             var buttonStyle = new GUIStyle(GUI.skin.button);
             if (isSelected) buttonStyle.normal = buttonStyle.active;
-            if (GUILayout.Button(slot.Key, buttonStyle, GUILayout.ExpandWidth(true)))
+
+            var slotName = slot.Key;
+            if (!string.IsNullOrWhiteSpace(slot.Name))
+                slotName += $" ({slot.Name})";
+
+            if (GUILayout.Button(slotName, buttonStyle, GUILayout.ExpandWidth(true)))
             {
                 CloseTagDropdown();
                 _selectedSlotIndex = isSelected ? -1 : index;
@@ -390,6 +395,7 @@ namespace Duckov_CashSlot.UI
                 Key = source.Key,
                 RequiredTags = [..source.RequiredTags],
                 ExcludedTags = [..source.ExcludedTags],
+                Name = source.Name,
                 ShowIn = source.ShowIn,
                 ForbidDeathDrop = source.ForbidDeathDrop,
                 ForbidWeightCalculation = source.ForbidWeightCalculation,
@@ -525,7 +531,7 @@ namespace Duckov_CashSlot.UI
             if (!isExpanded) return;
             GUILayout.BeginVertical("box");
 
-            _tagScrollPosition = GUILayout.BeginScrollView(_tagScrollPosition, GUILayout.Height(280));
+            _tagScrollPosition = GUILayout.BeginScrollView(_tagScrollPosition, GUILayout.Height(260));
 
             if (tags.Count == 0)
             {
@@ -621,6 +627,13 @@ namespace Duckov_CashSlot.UI
 
             GUILayout.Space(5);
 
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("槽位名称:", GUILayout.Width(120));
+            slot.Name = GUILayout.TextField(slot.Name);
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(10);
+
             DrawTagSection("必需标签", slot.RequiredTags, ref _requiredTagsExpanded, true);
 
             GUILayout.Space(5);
@@ -685,6 +698,7 @@ namespace Duckov_CashSlot.UI
                 Key = slot.Key,
                 RequiredTags = ValidateAndCleanTags([..slot.RequiredTags]),
                 ExcludedTags = ValidateAndCleanTags([..slot.ExcludedTags]),
+                Name = slot.Settings.Name ?? string.Empty,
                 ShowIn = slot.Settings.ShowIn,
                 ForbidDeathDrop = slot.Settings.ForbidDeathDrop,
                 ForbidWeightCalculation = slot.Settings.ForbidWeightCalculation,
@@ -704,6 +718,7 @@ namespace Duckov_CashSlot.UI
                 Key = slot.Key,
                 RequiredTags = ValidateAndCleanTags([..slot.RequiredTags]),
                 ExcludedTags = ValidateAndCleanTags([..slot.ExcludedTags]),
+                Name = slot.Settings.Name ?? string.Empty,
                 ShowIn = slot.Settings.ShowIn,
                 ForbidDeathDrop = slot.Settings.ForbidDeathDrop,
                 ForbidWeightCalculation = slot.Settings.ForbidWeightCalculation,
@@ -747,18 +762,23 @@ namespace Duckov_CashSlot.UI
                 slot.ExcludedTags = ValidateAndCleanTags(slot.ExcludedTags);
             }
 
-            var customSlots = _tempCustomSlots.Select(slot => new CustomSlot(
-                slot.Key,
-                slot.RequiredTags.ToArray(),
-                slot.ExcludedTags.ToArray(),
-                new(
-                    slot.ShowIn,
-                    slot.ForbidDeathDrop,
-                    slot.ForbidWeightCalculation,
-                    slot.ForbidItemsWithSameID,
-                    slot.DisableModifier
-                )
-            )).ToArray();
+            var customSlots = _tempCustomSlots.Select(slot =>
+            {
+                var slotName = string.IsNullOrWhiteSpace(slot.Name) ? null : slot.Name;
+                return new CustomSlot(
+                    slot.Key,
+                    slot.RequiredTags.ToArray(),
+                    slot.ExcludedTags.ToArray(),
+                    new(
+                        slotName,
+                        slot.ShowIn,
+                        slot.ForbidDeathDrop,
+                        slot.ForbidWeightCalculation,
+                        slot.ForbidItemsWithSameID,
+                        slot.DisableModifier
+                    )
+                );
+            }).ToArray();
 
             _originalConfig.CustomSlots = customSlots;
             _originalConfig.Validate();
@@ -779,6 +799,7 @@ namespace Duckov_CashSlot.UI
                 Key = slot.Key,
                 RequiredTags = ValidateAndCleanTags([..slot.RequiredTags]),
                 ExcludedTags = ValidateAndCleanTags([..slot.ExcludedTags]),
+                Name = slot.Settings.Name ?? string.Empty,
                 ShowIn = slot.Settings.ShowIn,
                 ForbidDeathDrop = slot.Settings.ForbidDeathDrop,
                 ForbidWeightCalculation = slot.Settings.ForbidWeightCalculation,
@@ -796,6 +817,7 @@ namespace Duckov_CashSlot.UI
                 Key = $"NewSlot_{Guid.NewGuid().ToString()[..8]}",
                 RequiredTags = [],
                 ExcludedTags = [],
+                Name = string.Empty,
                 ShowIn = ShowIn.Character,
                 ForbidDeathDrop = false,
                 ForbidWeightCalculation = false,
@@ -811,6 +833,7 @@ namespace Duckov_CashSlot.UI
             public string Key { get; set; } = string.Empty;
             public List<string> RequiredTags { get; set; } = [];
             public List<string> ExcludedTags { get; set; } = [];
+            public string Name { get; set; } = string.Empty;
             public ShowIn ShowIn { get; set; } = ShowIn.Character;
             public bool ForbidDeathDrop { get; set; }
             public bool ForbidWeightCalculation { get; set; }

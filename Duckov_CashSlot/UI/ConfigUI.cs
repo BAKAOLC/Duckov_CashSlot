@@ -100,11 +100,6 @@ namespace Duckov_CashSlot.UI
             }
 
             _windowRect = GUILayout.Window(999, _windowRect, DrawWindow, WindowTitle);
-
-            var currentEvent = Event.current;
-            if (currentEvent.type != EventType.Layout && currentEvent.type != EventType.Repaint)
-                if (_windowRect.Contains(currentEvent.mousePosition))
-                    currentEvent.Use();
         }
 
         private static bool IsMouseButton(KeyCode keyCode)
@@ -179,10 +174,26 @@ namespace Duckov_CashSlot.UI
                 DrawQuantityConfig("宠物侧背包列表显示列数", _tempDisplaySetting.PetInventoryDisplayColumns);
 
             GUILayout.Space(10);
-            
-            _tempDisplaySetting.PetSlotDisplayAboveInventory =
-                GUILayout.Toggle(_tempDisplaySetting.PetSlotDisplayAboveInventory,
-                    "是否将宠物侧槽位列表显示在宠物背包列表上方");
+
+            GUILayout.Label("宠物侧槽位列表显示位置");
+            _tempDisplaySetting.PetSlotDisplayPosition = (PetSlotDisplayPosition)GUILayout.SelectionGrid(
+                (int)_tempDisplaySetting.PetSlotDisplayPosition,
+                [
+                    "显示在玩家库存上方",
+                    "显示在玩家库存下方",
+                    "显示在宠物图标下方",
+                ],
+                3);
+            GUILayout.Label(
+                "提示：在装有 SuperPet Mod 且未启用新版本 Super Pet 显示样式适配时，此选项无效",
+                new GUIStyle(GUI.skin.label)
+                {
+                    fontSize = 16,
+                    normal = { textColor = Color.red },
+                    wordWrap = true,
+                });
+
+            GUILayout.Space(10);
 
             _tempDisplaySetting.NewSuperPetDisplayCompact =
                 GUILayout.Toggle(_tempDisplaySetting.NewSuperPetDisplayCompact,

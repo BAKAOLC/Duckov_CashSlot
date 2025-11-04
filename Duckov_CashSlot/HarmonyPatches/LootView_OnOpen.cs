@@ -54,9 +54,15 @@ namespace Duckov_CashSlot.HarmonyPatches
             if (gridLayout)
                 Utility.SetGridLayoutConstraintFixedColumnCount(gridLayout.gameObject,
                     SlotDisplaySetting.Instance.PetSlotDisplayColumns);
-            
-            var siblingIndex = SlotDisplaySetting.Instance.PetSlotDisplayAboveInventory ? 2 : 3;
-                petSlotCollectionDisplay.transform.SetSiblingIndex(siblingIndex);
+
+            var siblingIndex = SlotDisplaySetting.Instance.PetSlotDisplayPosition switch
+            {
+                PetSlotDisplayPosition.AboveInventory => 2,
+                PetSlotDisplayPosition.BelowInventory => 3,
+                PetSlotDisplayPosition.BelowPetIcon => 4,
+                _ => 4,
+            };
+            petSlotCollectionDisplay.transform.SetSiblingIndex(siblingIndex);
 
             var allowModifyOtherModDisplay = SlotDisplaySetting.Instance.AllowModifyOtherModPetDisplay;
             if (IsSuperModPatched())

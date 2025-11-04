@@ -18,6 +18,8 @@ namespace Duckov_CashSlot
         private static readonly Dictionary<string, RegisteredSlot> RegisteredSlots = [];
         private static readonly HashSet<SlotCollection> ProcessedSlotCollections = [];
 
+        private static bool _levelInitializing;
+
         private static readonly FieldInfo ForbidItemsWithSameIDField =
             AccessTools.Field(typeof(Slot), "forbidItemsWithSameID");
 
@@ -38,6 +40,8 @@ namespace Duckov_CashSlot
         {
             if (IsInitialized) return;
             SetupLocalization();
+            LevelManager.OnLevelBeginInitializing += OnLevelInitializing;
+            LevelManager.OnLevelInitialized += OnLevelInitialized;
             IsInitialized = true;
 
             ModLogger.Log("SlotManager initialized.");
@@ -46,6 +50,8 @@ namespace Duckov_CashSlot
         public static void Uninitialize()
         {
             if (!IsInitialized) return;
+            LevelManager.OnLevelBeginInitializing -= OnLevelInitializing;
+            LevelManager.OnLevelInitialized -= OnLevelInitialized;
             RemoveLocalization();
             ClearProcessedSlotCollections();
             IsInitialized = false;
@@ -181,9 +187,21 @@ namespace Duckov_CashSlot
             return [];
         }
 
+        public static void OnLevelInitializing()
+        {
+            _levelInitializing = true;
+        }
+
+        public static void OnLevelInitialized()
+        {
+            if (!_levelInitializing) return;
+
+            _levelInitializing = false;
+        }
+
         public static bool IsRegisteredSlot(Slot slot, bool checkMaster = true)
         {
-            if (checkMaster)
+            if (checkMaster && !_levelInitializing)
             {
                 if (slot.Master == null) return false;
                 if (slot.Master != MainCharacterItem) return false;

@@ -19,6 +19,7 @@ namespace Duckov_CashSlot.HarmonyPatches
         {
             if (otherItem == null) return true;
             if (otherItem.TypeID != ModConstant.KeyRingTypeID) return true;
+            if (__instance.Master.TypeID != ModConstant.KeyRingTypeID) return true;
             if (SlotManager.IsRegisteredSlot(__instance)) return true;
 
             ModLogger.Log(

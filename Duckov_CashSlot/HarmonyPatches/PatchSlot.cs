@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
-using Duckov.Utilities;
 using HarmonyLib;
 using ItemStatsSystem;
 using ItemStatsSystem.Items;

@@ -185,7 +185,7 @@ namespace Duckov_CashSlot
                 ? registeredSlot.Settings
                 : null;
         }
-        
+
         public static string? GetSlotName(Slot slot)
         {
             var key = slot.Key;

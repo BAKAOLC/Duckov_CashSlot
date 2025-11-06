@@ -2,15 +2,12 @@
   "window.title": "Duckov CashSlot Settings",
   "tab.rows": "Rows & Layout",
   "tab.slots": "Slots",
-  
   "common.reset_default": "Reset to Default",
   "common.save": "Save",
   "common.cancel": "Cancel",
-  
   "config.rows.saved": "Row settings saved",
   "config.key.saved": "Keybinding saved",
   "config.slots.saved": "Slot settings saved",
-
   "rows.inventory.max": "Max rows: Player inventory side slot list",
   "rows.pet.max": "Max rows: Pet side slot list",
   "rows.pet.columns": "Columns: Pet side slot list",
@@ -22,12 +19,10 @@
   "rows.pet.hint.superpet.invalid": "Hint: This option has no effect when SuperPet Mod is present and the new Super Pet style adaptation is disabled.",
   "rows.superpet.compact": "Enable NEW Super Pet style adaptation",
   "rows.superpet.allow_modify_others": "Allow this mod to modify pet backpack style modified by other mods",
-
   "keybinding.title": "UI Toggle Key",
   "keybinding.current": "Current Key: {0}",
   "keybinding.press_to_set": "Press the desired key...",
   "keybinding.detect": "Detect Key",
-
   "slots.add": "Add New Slot",
   "slots.cancel_all": "Cancel All Changes",
   "slots.reset_default": "Reset to Default",
@@ -35,7 +30,6 @@
   "slots.select_left_to_edit": "Select a slot on the left to view and edit",
   "slots.confirm": "OK",
   "slots.remove": "Delete this slot",
-
   "tags.select.placeholder": "Select tag...",
   "tags.invalid.prefix": "[Invalid] {0}",
   "tags.delete": "Delete",
@@ -50,9 +44,7 @@
   "tags.excluded.title": "Excluded Tags",
   "tags.empty.required.desc": "Name will display as '?' but any item is allowed.",
   "tags.empty.excluded.desc": "No items will be excluded.",
-
   "list.empty": "The list is empty",
-
   "slot.key": "Slot Key:",
   "slot.name": "Slot Name:",
   "slot.settings.title": "Slot Settings:",
@@ -63,13 +55,11 @@
   "slot.toggle.forbid_weight_calc": "Forbid weight calculation",
   "slot.toggle.forbid_same_id": "Forbid items with same ID",
   "slot.toggle.disable_modifier": "Disable item modifier stats (e.g., move speed, backpack capacity)",
-
   "quantity.current_value": "Current: {0}",
-
   "tags.type.required": "Required",
   "tags.type.excluded": "Excluded",
   "tags.clean.log.cleaned": "Cleaned {1} invalid tag(s) from {0} tags",
   "tags.clean.log.none": "No invalid tags to clean in {0} tags",
   "tags.clean.invalid_list": "Cleaned invalid tags: {0}",
-  "tags.empty_tag": "<Empty Tag>",
+  "tags.empty_tag": "<Empty Tag>"
 }

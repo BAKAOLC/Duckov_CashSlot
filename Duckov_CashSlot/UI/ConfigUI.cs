@@ -170,7 +170,8 @@ namespace Duckov_CashSlot.UI
             GUILayout.Space(10);
 
             _tempDisplaySetting.PetInventoryDisplayColumns =
-                DrawQuantityConfig(Localization.Tr("rows.pet.inv.columns"), _tempDisplaySetting.PetInventoryDisplayColumns);
+                DrawQuantityConfig(Localization.Tr("rows.pet.inv.columns"),
+                    _tempDisplaySetting.PetInventoryDisplayColumns);
 
             GUILayout.Space(10);
 
@@ -211,7 +212,8 @@ namespace Duckov_CashSlot.UI
             GUILayout.Space(20);
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button(Localization.Tr("common.reset_default"), GUILayout.Height(30))) _tempDisplaySetting.LoadDefault();
+            if (GUILayout.Button(Localization.Tr("common.reset_default"), GUILayout.Height(30)))
+                _tempDisplaySetting.LoadDefault();
             if (GUILayout.Button(Localization.Tr("common.save"), GUILayout.Height(30))) SaveSlotRowsConfig();
             GUILayout.EndHorizontal();
 
@@ -239,7 +241,8 @@ namespace Duckov_CashSlot.UI
         {
             GUILayout.Label(Localization.Tr("keybinding.title"), GUI.skin.label);
             GUILayout.BeginHorizontal();
-            GUILayout.Label(Localization.TrFormat("keybinding.current", UIConfig.Instance.ToggleKey), GUILayout.Width(200));
+            GUILayout.Label(Localization.TrFormat("keybinding.current", UIConfig.Instance.ToggleKey),
+                GUILayout.Width(200));
 
             if (_detectingKey)
             {
@@ -414,7 +417,9 @@ namespace Duckov_CashSlot.UI
             var allTags = TagManager.AllTags;
 
             var isValidTag = !string.IsNullOrEmpty(currentTag) && allTags.Any(t => t.name == currentTag);
-            var displayName = string.IsNullOrEmpty(currentTag) ? Localization.Tr("tags.select.placeholder") : GetTagDisplayName(currentTag);
+            var displayName = string.IsNullOrEmpty(currentTag)
+                ? Localization.Tr("tags.select.placeholder")
+                : GetTagDisplayName(currentTag);
 
             var mainButtonStyle = new GUIStyle(GUI.skin.button);
             if (!string.IsNullOrEmpty(currentTag) && !isValidTag)
@@ -608,7 +613,8 @@ namespace Duckov_CashSlot.UI
                     removedTags.Add(tagName);
             }
 
-            if (removedTags.Count > 0) ModLogger.LogWarning(Localization.TrFormat("tags.clean.invalid_list", string.Join(", ", removedTags)));
+            if (removedTags.Count > 0)
+                ModLogger.LogWarning(Localization.TrFormat("tags.clean.invalid_list", string.Join(", ", removedTags)));
 
             return validTags;
         }
@@ -645,13 +651,18 @@ namespace Duckov_CashSlot.UI
 
             GUILayout.BeginHorizontal();
             GUILayout.Label(Localization.Tr("slot.display_position"), GUILayout.Width(120));
-            slot.ShowIn = (ShowIn)GUILayout.SelectionGrid((int)slot.ShowIn, [Localization.Tr("slot.showin.character"), Localization.Tr("slot.showin.pet")], 2);
+            slot.ShowIn = (ShowIn)GUILayout.SelectionGrid((int)slot.ShowIn,
+                [Localization.Tr("slot.showin.character"), Localization.Tr("slot.showin.pet")], 2);
             GUILayout.EndHorizontal();
 
-            slot.ForbidDeathDrop = GUILayout.Toggle(slot.ForbidDeathDrop, Localization.Tr("slot.toggle.forbid_death_drop"));
-            slot.ForbidWeightCalculation = GUILayout.Toggle(slot.ForbidWeightCalculation, Localization.Tr("slot.toggle.forbid_weight_calc"));
-            slot.ForbidItemsWithSameID = GUILayout.Toggle(slot.ForbidItemsWithSameID, Localization.Tr("slot.toggle.forbid_same_id"));
-            slot.DisableModifier = GUILayout.Toggle(slot.DisableModifier, Localization.Tr("slot.toggle.disable_modifier"));
+            slot.ForbidDeathDrop =
+                GUILayout.Toggle(slot.ForbidDeathDrop, Localization.Tr("slot.toggle.forbid_death_drop"));
+            slot.ForbidWeightCalculation = GUILayout.Toggle(slot.ForbidWeightCalculation,
+                Localization.Tr("slot.toggle.forbid_weight_calc"));
+            slot.ForbidItemsWithSameID =
+                GUILayout.Toggle(slot.ForbidItemsWithSameID, Localization.Tr("slot.toggle.forbid_same_id"));
+            slot.DisableModifier =
+                GUILayout.Toggle(slot.DisableModifier, Localization.Tr("slot.toggle.disable_modifier"));
 
             GUILayout.FlexibleSpace();
 

@@ -43,9 +43,11 @@
         <ProjectReference Include="..\Duckov_ModPreloader\Duckov_ModPreloader.csproj"/>
     </ItemGroup>
 
-    <PropertyGroup>
-        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    </PropertyGroup>
+    <ItemGroup>
+        <None Update="Localizations\*.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <TargetPath>Localizations\%(Filename)%(Extension)</TargetPath>
+        </None>
+    </ItemGroup>
 
 </Project>

@@ -2,15 +2,12 @@
   "window.title": "Duckov CashSlot 配置",
   "tab.rows": "槽位行数配置",
   "tab.slots": "槽位配置",
-  
   "common.reset_default": "重置为默认值",
   "common.save": "保存配置",
   "common.cancel": "取消",
-  
   "config.rows.saved": "槽位行数配置已保存",
   "config.key.saved": "按键配置已保存",
   "config.slots.saved": "槽位配置已保存",
-  
   "rows.inventory.max": "玩家库存侧槽位列表最大显示行数",
   "rows.pet.max": "宠物侧槽位列表最大显示行数",
   "rows.pet.columns": "宠物侧槽位列表显示列数",
@@ -22,12 +19,10 @@
   "rows.pet.hint.superpet.invalid": "提示：在装有 SuperPet Mod 且未启用新版本 Super Pet 显示样式适配时，此选项无效",
   "rows.superpet.compact": "是否启用新版本 Super Pet 显示样式适配",
   "rows.superpet.allow_modify_others": "是否允许本 Mod 修改其它 Mod 修改的宠物背包显示样式",
-
   "keybinding.title": "界面开关按键",
   "keybinding.current": "当前按键: {0}",
   "keybinding.press_to_set": "按下要设置的按键...",
   "keybinding.detect": "检测按键",
-
   "slots.add": "添加新槽位",
   "slots.cancel_all": "取消所有配置",
   "slots.reset_default": "重置为默认值",
@@ -35,7 +30,6 @@
   "slots.select_left_to_edit": "请选择左侧槽位以查看和编辑配置",
   "slots.confirm": "确认",
   "slots.remove": "删除此槽位",
-
   "tags.select.placeholder": "选择标签...",
   "tags.invalid.prefix": "[无效] {0}",
   "tags.delete": "删除",
@@ -50,9 +44,7 @@
   "tags.excluded.title": "排除标签",
   "tags.empty.required.desc": "名称将显示为 \"?\" 但是允许放置任何物品",
   "tags.empty.excluded.desc": "不会排除任何物品",
-
   "list.empty": "当前列表为空",
-
   "slot.key": "槽位Key:",
   "slot.name": "槽位名称:",
   "slot.settings.title": "槽位设置:",
@@ -63,9 +55,7 @@
   "slot.toggle.forbid_weight_calc": "禁止重量计算",
   "slot.toggle.forbid_same_id": "禁止相同ID物品",
   "slot.toggle.disable_modifier": "禁用物品属性修正词条（比如移动速度、背包容量等）",
-
   "quantity.current_value": "当前值: {0}",
-
   "tags.type.required": "必需",
   "tags.type.excluded": "排除",
   "tags.clean.log.cleaned": "已从{0}标签清理 {1} 个无效标签",

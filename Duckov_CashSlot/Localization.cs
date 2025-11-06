@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
+using Newtonsoft.Json;
 using SodaCraft.Localizations;
 using UnityEngine;
 
@@ -13,10 +12,92 @@ namespace Duckov_CashSlot
         private static readonly object Sync = new();
         private static bool _initialized;
 
-        private static SystemLanguage _currentLanguage = SystemLanguage.English;
-        private static Dictionary<string, string> _active = new();
-        private static Dictionary<string, string> _en = new();
-        private static Dictionary<string, string> _cn = new();
+        private static Dictionary<string, string>? _currentLanguageDict;
+        private static Dictionary<string, string>? _englishDict;
+
+        private static SystemLanguage CurrentLanguage => LocalizationManager.CurrentLanguage;
+
+        private static string LocalizationDirectory
+        {
+            get
+            {
+                var asmDir = Path.GetDirectoryName(typeof(ModLoader).Assembly.Location) ?? "";
+                return Path.Combine(asmDir, "Localizations");
+            }
+        }
+
+        private static Dictionary<string, string> DefaultEnglish => new()
+        {
+            { "window.title", "Duckov CashSlot Settings" },
+            { "tab.rows", "Rows & Layout" },
+            { "tab.slots", "Slots" },
+            { "common.reset_default", "Reset to Default" },
+            { "common.save", "Save" },
+            { "common.cancel", "Cancel" },
+            { "config.rows.saved", "Row settings saved" },
+            { "config.key.saved", "Keybinding saved" },
+            { "config.slots.saved", "Slot settings saved" },
+            { "rows.inventory.max", "Max rows: Player inventory side slot list" },
+            { "rows.pet.max", "Max rows: Pet side slot list" },
+            { "rows.pet.columns", "Columns: Pet side slot list" },
+            { "rows.pet.inv.columns", "Columns: Pet side backpack list" },
+            { "rows.pet.position.title", "Pet-side slot list position" },
+            { "rows.pet.position.inv.above", "Above Player Inventory" },
+            { "rows.pet.position.inv.below", "Below Player Inventory" },
+            { "rows.pet.position.pet.below", "Below Pet Icon" },
+            {
+                "rows.pet.hint.superpet.invalid",
+                "Hint: This option has no effect when SuperPet Mod is present and the new Super Pet style adaptation is disabled."
+            },
+            { "rows.superpet.compact", "Enable NEW Super Pet style adaptation" },
+            {
+                "rows.superpet.allow_modify_others",
+                "Allow this mod to modify pet backpack style modified by other mods"
+            },
+            { "keybinding.title", "UI Toggle Key" },
+            { "keybinding.current", "Current Key: {0}" },
+            { "keybinding.press_to_set", "Press the desired key..." },
+            { "keybinding.detect", "Detect Key" },
+            { "slots.add", "Add New Slot" },
+            { "slots.cancel_all", "Cancel All Changes" },
+            { "slots.reset_default", "Reset to Default" },
+            { "slots.save", "Save" },
+            { "slots.select_left_to_edit", "Select a slot on the left to view and edit" },
+            { "slots.confirm", "OK" },
+            { "slots.remove", "Delete this slot" },
+            { "tags.select.placeholder", "Select tag..." },
+            { "tags.invalid.prefix", "[Invalid] {0}" },
+            { "tags.delete", "Delete" },
+            { "tags.search.label", "Search:" },
+            { "tags.search.clear", "Clear" },
+            { "tags.search.no_result", "No matching tag found" },
+            { "tags.close", "Close" },
+            { "tags.none", "None" },
+            { "tags.add", "Add Tag" },
+            { "tags.clean_invalid", "Clean Invalid Tags" },
+            { "tags.required.title", "Required Tags" },
+            { "tags.excluded.title", "Excluded Tags" },
+            { "tags.empty.required.desc", "Name will display as '?' but any item is allowed." },
+            { "tags.empty.excluded.desc", "No items will be excluded." },
+            { "list.empty", "The list is empty" },
+            { "slot.key", "Slot Key:" },
+            { "slot.name", "Slot Name:" },
+            { "slot.settings.title", "Slot Settings:" },
+            { "slot.display_position", "Display Position:" },
+            { "slot.showin.character", "Character" },
+            { "slot.showin.pet", "Pet" },
+            { "slot.toggle.forbid_death_drop", "Forbid dropping on death" },
+            { "slot.toggle.forbid_weight_calc", "Forbid weight calculation" },
+            { "slot.toggle.forbid_same_id", "Forbid items with same ID" },
+            { "slot.toggle.disable_modifier", "Disable item modifier stats (e.g., move speed, backpack capacity)" },
+            { "quantity.current_value", "Current: {0}" },
+            { "tags.type.required", "Required" },
+            { "tags.type.excluded", "Excluded" },
+            { "tags.clean.log.cleaned", "Cleaned {1} invalid tag(s) from {0} tags" },
+            { "tags.clean.log.none", "No invalid tags to clean in {0} tags" },
+            { "tags.clean.invalid_list", "Cleaned invalid tags: {0}" },
+            { "tags.empty_tag", "<Empty Tag>" },
+        };
 
         public static void Initialize()
         {
@@ -27,21 +108,17 @@ namespace Duckov_CashSlot
 
                 try
                 {
-                    // Load base fallbacks first
-                    _en = LoadLanguageFile(SystemLanguage.English);
-                    _cn = LoadLanguageFile(SystemLanguage.ChineseSimplified);
-                    _active = _en;
+                    LocalizationManager.OnSetLanguage += OnLanguageChanged;
 
-                    // Subscribe to language change and set initial language
-                    LocalizationManager.OnSetLanguage += OnSetLanguage;
-                    var lang = LocalizationManager.CurrentLanguage;
-                    SetLanguage(lang);
+                    Directory.CreateDirectory(LocalizationDirectory);
 
-                    ModLogger.Log("Localization initialized with JSON files.");
+                    LoadLanguageFiles();
                 }
                 catch (Exception ex)
                 {
-                    ModLogger.LogError($"Localization initialization failed: {ex}");
+                    ModLogger.LogError($"Failed to initialize localization: {ex.Message}");
+                    _currentLanguageDict = DefaultEnglish;
+                    _englishDict = DefaultEnglish;
                 }
 
                 _initialized = true;
@@ -55,7 +132,7 @@ namespace Duckov_CashSlot
             {
                 try
                 {
-                    LocalizationManager.OnSetLanguage -= OnSetLanguage;
+                    LocalizationManager.OnSetLanguage -= OnLanguageChanged;
                 }
                 catch (Exception ex)
                 {
@@ -64,41 +141,102 @@ namespace Duckov_CashSlot
                 finally
                 {
                     _initialized = false;
+                    _currentLanguageDict = null;
+                    _englishDict = null;
                 }
             }
         }
 
-        private static void OnSetLanguage(SystemLanguage language)
+        private static void OnLanguageChanged(SystemLanguage language)
         {
-            SetLanguage(language);
-        }
-
-        public static void SetLanguage(SystemLanguage language)
-        {
-            if (_currentLanguage == language) return;
-
             lock (Sync)
             {
-                _currentLanguage = language;
+                LoadLanguageFiles();
+            }
+        }
+
+        private static void LoadLanguageFiles()
+        {
+            try
+            {
+                var languageKey = GetLanguageKey();
+                var languageFile = Path.Combine(LocalizationDirectory, $"{languageKey}.json");
+                var englishFile = Path.Combine(LocalizationDirectory, "English.json");
+
+                _englishDict = LoadLanguageFile(englishFile, DefaultEnglish);
+                _currentLanguageDict = languageKey == "English"
+                    ? _englishDict
+                    : LoadLanguageFile(languageFile, _englishDict);
+            }
+            catch (Exception ex)
+            {
+                ModLogger.LogError($"Failed to load language files: {ex.Message}");
+                _currentLanguageDict = DefaultEnglish;
+                _englishDict = DefaultEnglish;
+            }
+        }
+
+        private static Dictionary<string, string> LoadLanguageFile(string filePath, Dictionary<string, string> fallback)
+        {
+            if (!File.Exists(filePath))
+            {
                 try
                 {
-                    _active = LoadLanguageFile(language);
-                    ModLogger.Log($"Localization language set to {_currentLanguage}; loaded {_active.Count} entries.");
+                    var json = JsonConvert.SerializeObject(fallback, Formatting.Indented);
+                    File.WriteAllText(filePath, json);
+                    ModLogger.Log($"Created localization file: {filePath}");
                 }
                 catch (Exception ex)
                 {
-                    ModLogger.LogError($"Failed to load localization for {language}: {ex.Message}");
-                    _active = new Dictionary<string, string>();
+                    ModLogger.LogError($"Failed to create localization file {filePath}: {ex.Message}");
                 }
+
+                return fallback;
             }
+
+            try
+            {
+                var json = File.ReadAllText(filePath);
+                var dict = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+                if (dict == null)
+                {
+                    ModLogger.LogWarning($"Failed to parse localization file: {filePath}, using fallback.");
+                    return fallback;
+                }
+
+                var result = new Dictionary<string, string>(fallback);
+                foreach (var kvp in dict) result[kvp.Key] = kvp.Value;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                ModLogger.LogError($"Failed to load localization file {filePath}: {ex.Message}");
+                return fallback;
+            }
+        }
+
+        private static string GetLanguageKey()
+        {
+            var language = CurrentLanguage;
+
+            return language switch
+            {
+                SystemLanguage.Chinese or SystemLanguage.ChineseSimplified => "Chinese",
+                SystemLanguage.ChineseTraditional => "ChineseTraditional",
+                _ => language.ToString(),
+            };
         }
 
         public static string Tr(string key)
         {
-            if (TryGet(_active, key, out var v)) return v;
-            if (TryGet(_en, key, out v)) return v;
-            if (TryGet(_cn, key, out v)) return v;
-            // Return debug string so missing keys stand out
+            Initialize();
+
+            if (_currentLanguageDict != null && _currentLanguageDict.TryGetValue(key, out var text))
+                return text;
+
+            if (_englishDict != null && _englishDict.TryGetValue(key, out var englishText))
+                return englishText;
+
             return $"<<{key}>>";
         }
 
@@ -106,169 +244,6 @@ namespace Duckov_CashSlot
         {
             var format = Tr(key);
             return string.Format(format, args);
-        }
-
-        private static bool TryGet(Dictionary<string, string> dict, string key, out string value)
-        {
-            if (dict.TryGetValue(key, out value)) return true;
-            return false;
-        }
-
-        private static Dictionary<string, string> LoadLanguageFile(SystemLanguage language)
-        {
-            var path = GetLanguageFilePath(language);
-            try
-            {
-                if (!File.Exists(path))
-                {
-                    ModLogger.LogWarning($"Localization file not found: {path}");
-                    return new Dictionary<string, string>();
-                }
-
-                var json = File.ReadAllText(path);
-                var dict = ParseFlatJson(json);
-                return dict;
-            }
-            catch (Exception ex)
-            {
-                ModLogger.LogError($"Failed to load or parse localization file {path}: {ex.Message}");
-                return new Dictionary<string, string>();
-            }
-        }
-
-        private static string GetLanguageFilePath(SystemLanguage language)
-        {
-            var fileName = language switch
-            {
-                SystemLanguage.English => "en.json",
-                SystemLanguage.Chinese => "cn.json",
-                SystemLanguage.ChineseSimplified => "cn.json",
-                SystemLanguage.ChineseTraditional => "cn.json",
-                _ => "en.json"
-            };
-
-            ModLogger.Log($"Loading localization file for language {language}, fileName: {fileName}");
-
-            var asmDir = Path.GetDirectoryName(typeof(ModLoader).Assembly.Location) ?? "";
-            return Path.Combine(asmDir, "Localization", fileName);
-        }
-
-        // Minimal flat JSON parser: expects an object with string keys and string values.
-        private static Dictionary<string, string> ParseFlatJson(string json)
-        {
-            var dict = new Dictionary<string, string>();
-            if (string.IsNullOrEmpty(json)) return dict;
-
-            int i = 0;
-
-            void SkipWs()
-            {
-                while (i < json.Length && char.IsWhiteSpace(json[i])) i++;
-            }
-
-            SkipWs();
-            if (i >= json.Length || json[i] != '{') return dict;
-            i++; // skip '{'
-
-            while (true)
-            {
-                SkipWs();
-                if (i >= json.Length) break;
-                if (json[i] == '}')
-                {
-                    i++;
-                    break;
-                }
-
-                // key
-                if (json[i] != '"') break;
-                var key = ReadJsonString(json, ref i);
-                if (key == null) break;
-
-                SkipWs();
-                if (i >= json.Length || json[i] != ':') break;
-                i++; // skip ':'
-
-                SkipWs();
-                if (i >= json.Length) break;
-                if (json[i] != '"') break; // only string values supported
-                var value = ReadJsonString(json, ref i) ?? string.Empty;
-
-                if (!dict.ContainsKey(key)) dict[key] = value;
-                else dict[key] = value;
-
-                SkipWs();
-                if (i >= json.Length) break;
-                if (json[i] == ',')
-                {
-                    i++;
-                    continue;
-                }
-
-                if (json[i] == '}')
-                {
-                    i++;
-                    break;
-                }
-
-                // invalid char; stop
-                break;
-            }
-
-            return dict;
-        }
-
-        private static string ReadJsonString(string s, ref int i)
-        {
-            if (i >= s.Length || s[i] != '"') return "";
-            i++; // skip opening quote
-            var result = new System.Text.StringBuilder();
-            while (i < s.Length)
-            {
-                var c = s[i++];
-                if (c == '"') break;
-                if (c == '\\')
-                {
-                    if (i >= s.Length) break;
-                    var e = s[i++];
-                    switch (e)
-                    {
-                        case '"': result.Append('"'); break;
-                        case '\\': result.Append('\\'); break;
-                        case '/': result.Append('/'); break;
-                        case 'b': result.Append('\b'); break;
-                        case 'f': result.Append('\f'); break;
-                        case 'n': result.Append('\n'); break;
-                        case 'r': result.Append('\r'); break;
-                        case 't': result.Append('\t'); break;
-                        case 'u':
-                            if (i + 3 < s.Length)
-                            {
-                                var hex = s.Substring(i, 4);
-                                if (ushort.TryParse(hex, System.Globalization.NumberStyles.HexNumber, null,
-                                        out var code))
-                                {
-                                    result.Append((char)code);
-                                    i += 4;
-                                    break;
-                                }
-                            }
-
-                            // invalid, append literally
-                            result.Append('u');
-                            break;
-                        default:
-                            result.Append(e);
-                            break;
-                    }
-                }
-                else
-                {
-                    result.Append(c);
-                }
-            }
-
-            return result.ToString();
         }
     }
 }

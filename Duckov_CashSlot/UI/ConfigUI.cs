@@ -11,7 +11,6 @@ namespace Duckov_CashSlot.UI
     {
         private const float WindowWidth = 1200f;
         private const float WindowHeight = 700f;
-        private const string WindowTitle = "Duckov CashSlot 配置";
         private readonly Dictionary<int, string> _positionInputs = [];
         private readonly Dictionary<int, CustomSlotEditingData> _slotBackups = [];
         private int _currentTab;
@@ -99,7 +98,7 @@ namespace Duckov_CashSlot.UI
                     WindowHeight);
             }
 
-            _windowRect = GUILayout.Window(999, _windowRect, DrawWindow, WindowTitle);
+            _windowRect = GUILayout.Window(999, _windowRect, DrawWindow, Localization.Tr("window.title"));
         }
 
         private static bool IsMouseButton(KeyCode keyCode)
@@ -116,13 +115,13 @@ namespace Duckov_CashSlot.UI
             GUILayout.BeginVertical(GUILayout.ExpandHeight(true));
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Toggle(_currentTab == 0, "槽位行数配置", "Button"))
+            if (GUILayout.Toggle(_currentTab == 0, Localization.Tr("tab.rows"), "Button"))
             {
                 _currentTab = 0;
                 _selectedSlotIndex = -1;
             }
 
-            if (GUILayout.Toggle(_currentTab == 1, "槽位配置", "Button")) _currentTab = 1;
+            if (GUILayout.Toggle(_currentTab == 1, Localization.Tr("tab.slots"), "Button")) _currentTab = 1;
             GUILayout.EndHorizontal();
 
             GUILayout.Space(10);
@@ -156,36 +155,36 @@ namespace Duckov_CashSlot.UI
             GUILayout.BeginVertical("box", GUILayout.ExpandHeight(true));
 
             _tempDisplaySetting.InventorySlotDisplayRows =
-                DrawQuantityConfig("玩家库存侧槽位列表最大显示行数", _tempDisplaySetting.InventorySlotDisplayRows);
+                DrawQuantityConfig(Localization.Tr("rows.inventory.max"), _tempDisplaySetting.InventorySlotDisplayRows);
 
             GUILayout.Space(10);
 
             _tempDisplaySetting.PetSlotDisplayRows =
-                DrawQuantityConfig("宠物侧槽位列表最大显示行数", _tempDisplaySetting.PetSlotDisplayRows);
+                DrawQuantityConfig(Localization.Tr("rows.pet.max"), _tempDisplaySetting.PetSlotDisplayRows);
 
             GUILayout.Space(10);
 
             _tempDisplaySetting.PetSlotDisplayColumns =
-                DrawQuantityConfig("宠物侧槽位列表显示列数", _tempDisplaySetting.PetSlotDisplayColumns);
+                DrawQuantityConfig(Localization.Tr("rows.pet.columns"), _tempDisplaySetting.PetSlotDisplayColumns);
 
             GUILayout.Space(10);
 
             _tempDisplaySetting.PetInventoryDisplayColumns =
-                DrawQuantityConfig("宠物侧背包列表显示列数", _tempDisplaySetting.PetInventoryDisplayColumns);
+                DrawQuantityConfig(Localization.Tr("rows.pet.inv.columns"), _tempDisplaySetting.PetInventoryDisplayColumns);
 
             GUILayout.Space(10);
 
-            GUILayout.Label("宠物侧槽位列表显示位置");
+            GUILayout.Label(Localization.Tr("rows.pet.position.title"));
             _tempDisplaySetting.PetSlotDisplayPosition = (PetSlotDisplayPosition)GUILayout.SelectionGrid(
                 (int)_tempDisplaySetting.PetSlotDisplayPosition,
                 [
-                    "显示在玩家库存上方",
-                    "显示在玩家库存下方",
-                    "显示在宠物图标下方",
+                    Localization.Tr("rows.pet.position.inv.above"),
+                    Localization.Tr("rows.pet.position.inv.below"),
+                    Localization.Tr("rows.pet.position.pet.below"),
                 ],
                 3);
             GUILayout.Label(
-                "提示：在装有 SuperPet Mod 且未启用新版本 Super Pet 显示样式适配时，此选项无效",
+                Localization.Tr("rows.pet.hint.superpet.invalid"),
                 new GUIStyle(GUI.skin.label)
                 {
                     fontSize = 16,
@@ -197,11 +196,11 @@ namespace Duckov_CashSlot.UI
 
             _tempDisplaySetting.NewSuperPetDisplayCompact =
                 GUILayout.Toggle(_tempDisplaySetting.NewSuperPetDisplayCompact,
-                    "是否启用新版本 Super Pet 显示样式适配");
+                    Localization.Tr("rows.superpet.compact"));
 
             _tempDisplaySetting.AllowModifyOtherModPetDisplay =
                 GUILayout.Toggle(_tempDisplaySetting.AllowModifyOtherModPetDisplay,
-                    "是否允许本 Mod 修改其它 Mod 修改的宠物背包显示样式");
+                    Localization.Tr("rows.superpet.allow_modify_others"));
 
             GUILayout.Space(20);
 
@@ -212,8 +211,8 @@ namespace Duckov_CashSlot.UI
             GUILayout.Space(20);
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("重置为默认值", GUILayout.Height(30))) _tempDisplaySetting.LoadDefault();
-            if (GUILayout.Button("保存配置", GUILayout.Height(30))) SaveSlotRowsConfig();
+            if (GUILayout.Button(Localization.Tr("common.reset_default"), GUILayout.Height(30))) _tempDisplaySetting.LoadDefault();
+            if (GUILayout.Button(Localization.Tr("common.save"), GUILayout.Height(30))) SaveSlotRowsConfig();
             GUILayout.EndHorizontal();
 
             GUILayout.EndVertical();
@@ -227,7 +226,7 @@ namespace Duckov_CashSlot.UI
 
             using (new GUILayout.HorizontalScope())
             {
-                GUILayout.Label($"当前值: {quantity}", GUILayout.Width(200));
+                GUILayout.Label(Localization.TrFormat("quantity.current_value", quantity), GUILayout.Width(200));
 
                 if (GUILayout.Button("-", GUILayout.Width(30))) quantity = Math.Max(1, quantity - 1);
                 if (GUILayout.Button("+", GUILayout.Width(30))) quantity++;
@@ -238,18 +237,18 @@ namespace Duckov_CashSlot.UI
 
         private void DrawKeyCodeConfig()
         {
-            GUILayout.Label("界面开关按键", GUI.skin.label);
+            GUILayout.Label(Localization.Tr("keybinding.title"), GUI.skin.label);
             GUILayout.BeginHorizontal();
-            GUILayout.Label($"当前按键: {UIConfig.Instance.ToggleKey}", GUILayout.Width(200));
+            GUILayout.Label(Localization.TrFormat("keybinding.current", UIConfig.Instance.ToggleKey), GUILayout.Width(200));
 
             if (_detectingKey)
             {
-                GUILayout.Label("按下要设置的按键...", GUI.skin.label);
-                if (GUILayout.Button("取消", GUILayout.Width(100))) _detectingKey = false;
+                GUILayout.Label(Localization.Tr("keybinding.press_to_set"), GUI.skin.label);
+                if (GUILayout.Button(Localization.Tr("common.cancel"), GUILayout.Width(100))) _detectingKey = false;
             }
             else
             {
-                if (GUILayout.Button("检测按键", GUILayout.Width(100))) _detectingKey = true;
+                if (GUILayout.Button(Localization.Tr("keybinding.detect"), GUILayout.Width(100))) _detectingKey = true;
             }
 
             GUILayout.EndHorizontal();
@@ -274,10 +273,10 @@ namespace Duckov_CashSlot.UI
             GUILayout.Space(10);
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("添加新槽位", GUILayout.Height(30))) AddNewSlot();
-            if (GUILayout.Button("取消所有配置", GUILayout.Height(30))) CancelAllSlotConfig();
-            if (GUILayout.Button("重置为默认值", GUILayout.Height(30))) ResetToDefault();
-            if (GUILayout.Button("保存配置", GUILayout.Height(30))) SaveSlotConfig();
+            if (GUILayout.Button(Localization.Tr("slots.add"), GUILayout.Height(30))) AddNewSlot();
+            if (GUILayout.Button(Localization.Tr("slots.cancel_all"), GUILayout.Height(30))) CancelAllSlotConfig();
+            if (GUILayout.Button(Localization.Tr("common.reset_default"), GUILayout.Height(30))) ResetToDefault();
+            if (GUILayout.Button(Localization.Tr("slots.save"), GUILayout.Height(30))) SaveSlotConfig();
             GUILayout.EndHorizontal();
 
             GUILayout.EndVertical();
@@ -293,7 +292,7 @@ namespace Duckov_CashSlot.UI
             }
             else
             {
-                GUILayout.Label("请选择左侧槽位以查看和编辑配置", GUI.skin.label);
+                GUILayout.Label(Localization.Tr("slots.select_left_to_edit"), GUI.skin.label);
             }
 
             GUILayout.EndVertical();
@@ -320,7 +319,7 @@ namespace Duckov_CashSlot.UI
             var positionInput = GUILayout.TextField(_positionInputs[index], GUILayout.Width(50));
             _positionInputs[index] = positionInput;
 
-            if (GUILayout.Button("确认", GUILayout.Width(50)))
+            if (GUILayout.Button(Localization.Tr("slots.confirm"), GUILayout.Width(50)))
                 if (int.TryParse(_positionInputs[index], out var targetPosition))
                     MoveSlotToPosition(index, targetPosition - 1);
 
@@ -415,13 +414,13 @@ namespace Duckov_CashSlot.UI
             var allTags = TagManager.AllTags;
 
             var isValidTag = !string.IsNullOrEmpty(currentTag) && allTags.Any(t => t.name == currentTag);
-            var displayName = string.IsNullOrEmpty(currentTag) ? "选择标签..." : GetTagDisplayName(currentTag);
+            var displayName = string.IsNullOrEmpty(currentTag) ? Localization.Tr("tags.select.placeholder") : GetTagDisplayName(currentTag);
 
             var mainButtonStyle = new GUIStyle(GUI.skin.button);
             if (!string.IsNullOrEmpty(currentTag) && !isValidTag)
             {
                 mainButtonStyle.normal.textColor = Color.red;
-                displayName = $"[无效] {currentTag}";
+                displayName = string.Format(Localization.Tr("tags.invalid.prefix"), currentTag);
             }
 
             if (GUILayout.Button(displayName, mainButtonStyle, GUILayout.ExpandWidth(true)))
@@ -437,7 +436,7 @@ namespace Duckov_CashSlot.UI
                 }
             }
 
-            if (GUILayout.Button("删除", GUILayout.Width(60)))
+            if (GUILayout.Button(Localization.Tr("tags.delete"), GUILayout.Width(60)))
             {
                 tags.RemoveAt(tagIndex);
                 if (_openTagDropdownKey == dropdownKey) CloseTagDropdown();
@@ -450,10 +449,10 @@ namespace Duckov_CashSlot.UI
             GUILayout.BeginVertical("box");
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("搜索:", GUILayout.Width(40));
+            GUILayout.Label(Localization.Tr("tags.search.label"), GUILayout.Width(40));
             _tagSearchText = GUILayout.TextField(_tagSearchText);
 
-            if (GUILayout.Button("清空", GUILayout.Width(40))) _tagSearchText = "";
+            if (GUILayout.Button(Localization.Tr("tags.search.clear"), GUILayout.Width(40))) _tagSearchText = "";
             GUILayout.EndHorizontal();
 
             var filteredTags = allTags.Where(filteredTag =>
@@ -466,7 +465,7 @@ namespace Duckov_CashSlot.UI
                 GUILayout.Height(150));
 
             if (filteredTags.Count == 0)
-                GUILayout.Label("未找到匹配的标签", GUI.skin.label);
+                GUILayout.Label(Localization.Tr("tags.search.no_result"), GUI.skin.label);
             else
                 foreach (var filteredTag in filteredTags)
                 {
@@ -487,14 +486,14 @@ namespace Duckov_CashSlot.UI
 
             GUILayout.EndScrollView();
 
-            if (GUILayout.Button("关闭", GUILayout.Height(25))) CloseTagDropdown();
+            if (GUILayout.Button(Localization.Tr("tags.close"), GUILayout.Height(25))) CloseTagDropdown();
 
             GUILayout.EndVertical();
         }
 
         private static string GetTagDisplayName(string tagName)
         {
-            if (string.IsNullOrEmpty(tagName)) return "未选择";
+            if (string.IsNullOrEmpty(tagName)) return Localization.Tr("tags.none");
 
             var tag = TagManager.GetTagByName(tagName);
             return tag != null ? $"{tag.DisplayName} ({tag.name})" : tagName;
@@ -536,7 +535,7 @@ namespace Duckov_CashSlot.UI
             if (tags.Count == 0)
             {
                 GUILayout.BeginVertical("box");
-                GUILayout.Label("当前列表为空", GUI.skin.label);
+                GUILayout.Label(Localization.Tr("list.empty"), GUI.skin.label);
                 GUILayout.Space(5);
                 var descriptionStyle = new GUIStyle(GUI.skin.label)
                 {
@@ -546,8 +545,8 @@ namespace Duckov_CashSlot.UI
                 };
 
                 var emptyDescription = isRequired
-                    ? "名称将显示为 \"?\" 但是允许放置任何物品"
-                    : "不会排除任何物品";
+                    ? Localization.Tr("tags.empty.required.desc")
+                    : Localization.Tr("tags.empty.excluded.desc");
                 GUILayout.Label(emptyDescription, descriptionStyle);
                 GUILayout.EndVertical();
             }
@@ -559,7 +558,7 @@ namespace Duckov_CashSlot.UI
             GUILayout.EndScrollView();
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("添加标签"))
+            if (GUILayout.Button(Localization.Tr("tags.add")))
             {
                 tags.Add("");
 
@@ -570,17 +569,17 @@ namespace Duckov_CashSlot.UI
                 _tagSearchText = "";
             }
 
-            if (GUILayout.Button("清理无效标签"))
+            if (GUILayout.Button(Localization.Tr("tags.clean_invalid")))
             {
                 var originalCount = tags.Count;
                 var validTags = ValidateAndCleanTags(tags);
                 tags.Clear();
                 tags.AddRange(validTags);
                 var removedCount = originalCount - tags.Count;
-                var tagTypeName = isRequired ? "必需" : "排除";
+                var tagTypeName = Localization.Tr(isRequired ? "tags.type.required" : "tags.type.excluded");
                 ModLogger.Log(removedCount > 0
-                    ? $"已从{tagTypeName}标签清理 {removedCount} 个无效标签"
-                    : $"{tagTypeName}标签没有无效标签需要清理");
+                    ? Localization.TrFormat("tags.clean.log.cleaned", tagTypeName, removedCount)
+                    : Localization.TrFormat("tags.clean.log.none", tagTypeName));
             }
 
             GUILayout.EndHorizontal();
@@ -598,7 +597,7 @@ namespace Duckov_CashSlot.UI
             {
                 if (string.IsNullOrEmpty(tagName))
                 {
-                    removedTags.Add("空标签");
+                    removedTags.Add(Localization.Tr("tags.empty_tag"));
                     continue;
                 }
 
@@ -609,7 +608,7 @@ namespace Duckov_CashSlot.UI
                     removedTags.Add(tagName);
             }
 
-            if (removedTags.Count > 0) ModLogger.LogWarning($"已清理无效标签: {string.Join(", ", removedTags)}");
+            if (removedTags.Count > 0) ModLogger.LogWarning(Localization.TrFormat("tags.clean.invalid_list", string.Join(", ", removedTags)));
 
             return validTags;
         }
@@ -621,45 +620,45 @@ namespace Duckov_CashSlot.UI
             GUILayout.BeginVertical("box", GUILayout.ExpandHeight(true));
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("槽位Key:", GUILayout.Width(120));
+            GUILayout.Label(Localization.Tr("slot.key"), GUILayout.Width(120));
             slot.Key = GUILayout.TextField(slot.Key);
             GUILayout.EndHorizontal();
 
             GUILayout.Space(5);
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("槽位名称:", GUILayout.Width(120));
+            GUILayout.Label(Localization.Tr("slot.name"), GUILayout.Width(120));
             slot.Name = GUILayout.TextField(slot.Name);
             GUILayout.EndHorizontal();
 
             GUILayout.Space(10);
 
-            DrawTagSection("必需标签", slot.RequiredTags, ref _requiredTagsExpanded, true);
+            DrawTagSection(Localization.Tr("tags.required.title"), slot.RequiredTags, ref _requiredTagsExpanded, true);
 
             GUILayout.Space(5);
 
-            DrawTagSection("排除标签", slot.ExcludedTags, ref _excludedTagsExpanded, false);
+            DrawTagSection(Localization.Tr("tags.excluded.title"), slot.ExcludedTags, ref _excludedTagsExpanded, false);
 
             GUILayout.Space(10);
 
-            GUILayout.Label("槽位设置:", GUI.skin.label);
+            GUILayout.Label(Localization.Tr("slot.settings.title"), GUI.skin.label);
 
             GUILayout.BeginHorizontal();
-            GUILayout.Label("显示位置:", GUILayout.Width(120));
-            slot.ShowIn = (ShowIn)GUILayout.SelectionGrid((int)slot.ShowIn, ["角色", "宠物"], 2);
+            GUILayout.Label(Localization.Tr("slot.display_position"), GUILayout.Width(120));
+            slot.ShowIn = (ShowIn)GUILayout.SelectionGrid((int)slot.ShowIn, [Localization.Tr("slot.showin.character"), Localization.Tr("slot.showin.pet")], 2);
             GUILayout.EndHorizontal();
 
-            slot.ForbidDeathDrop = GUILayout.Toggle(slot.ForbidDeathDrop, "禁止死亡掉落");
-            slot.ForbidWeightCalculation = GUILayout.Toggle(slot.ForbidWeightCalculation, "禁止重量计算");
-            slot.ForbidItemsWithSameID = GUILayout.Toggle(slot.ForbidItemsWithSameID, "禁止相同ID物品");
-            slot.DisableModifier = GUILayout.Toggle(slot.DisableModifier, "禁用物品属性修正词条（比如移动速度、背包容量等）");
+            slot.ForbidDeathDrop = GUILayout.Toggle(slot.ForbidDeathDrop, Localization.Tr("slot.toggle.forbid_death_drop"));
+            slot.ForbidWeightCalculation = GUILayout.Toggle(slot.ForbidWeightCalculation, Localization.Tr("slot.toggle.forbid_weight_calc"));
+            slot.ForbidItemsWithSameID = GUILayout.Toggle(slot.ForbidItemsWithSameID, Localization.Tr("slot.toggle.forbid_same_id"));
+            slot.DisableModifier = GUILayout.Toggle(slot.DisableModifier, Localization.Tr("slot.toggle.disable_modifier"));
 
             GUILayout.FlexibleSpace();
 
             GUILayout.Space(10);
 
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("取消", GUILayout.Height(30)))
+            if (GUILayout.Button(Localization.Tr("common.cancel"), GUILayout.Height(30)))
                 if (_slotBackups.ContainsKey(index))
                 {
                     var backup = _slotBackups[index];
@@ -674,7 +673,7 @@ namespace Duckov_CashSlot.UI
                     _slotBackups.Remove(index);
                 }
 
-            if (GUILayout.Button("删除此槽位", GUILayout.Height(30)))
+            if (GUILayout.Button(Localization.Tr("slots.remove"), GUILayout.Height(30)))
                 if (index < _tempCustomSlots.Count)
                 {
                     _tempCustomSlots.RemoveAt(index);
@@ -741,7 +740,7 @@ namespace Duckov_CashSlot.UI
             ConfigManager.SaveConfigToFile(config, "SlotDisplaySetting.json");
 
             _tempDisplaySetting.CopyFrom(config);
-            ModLogger.Log("槽位行数配置已保存");
+            ModLogger.Log(Localization.Tr("config.rows.saved"));
         }
 
         private static void SaveKeyCodeConfig()
@@ -749,7 +748,7 @@ namespace Duckov_CashSlot.UI
             var config = UIConfig.Instance;
             config.Validate();
             ConfigManager.SaveConfigToFile(config, "UIConfig.json");
-            ModLogger.Log("按键配置已保存");
+            ModLogger.Log(Localization.Tr("config.key.saved"));
         }
 
         private void SaveSlotConfig()
@@ -787,7 +786,7 @@ namespace Duckov_CashSlot.UI
 
             _originalConfig = ConfigManager.LoadConfigFromFile<CustomSlotSetting>(CustomSlotManager.ConfigName, false);
 
-            ModLogger.Log("槽位配置已保存");
+            ModLogger.Log(Localization.Tr("config.slots.saved"));
         }
 
         private void ResetToDefault()

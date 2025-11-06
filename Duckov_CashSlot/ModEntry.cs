@@ -10,6 +10,7 @@ namespace Duckov_CashSlot
 
         public static void Initialize()
         {
+            Localization.Initialize();
             SlotManager.Initialize();
             CustomSlotManager.Initialize();
             _ = SlotDisplaySetting.Instance; // Ensure SlotDisplaySetting is loaded
@@ -40,6 +41,7 @@ namespace Duckov_CashSlot
             CustomSlotManager.Uninitialize();
             SlotManager.ClearRegisteredSlots();
             SlotManager.Uninitialize();
+            Localization.Uninitialize();
         }
 
         private static void InitializeConfigUI()

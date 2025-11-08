@@ -150,7 +150,7 @@ namespace Duckov_CashSlot.HarmonyPatches
 
         private static bool IsBetterDuckovPatched()
         {
-            return Harmony.HasAnyPatches(ModConstant.BetterDuckovID);
+            return Harmony.HasAnyPatches(ModConstant.BetterPetCapacityID);
         }
     }
     // ReSharper restore InconsistentNaming

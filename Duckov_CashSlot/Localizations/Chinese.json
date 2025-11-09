@@ -19,6 +19,8 @@
   "rows.pet.hint.superpet.invalid": "提示：在装有 SuperPet Mod 且未启用新版本 Super Pet 显示样式适配时，此选项无效",
   "rows.superpet.compact": "是否启用新版本 Super Pet 显示样式适配",
   "rows.superpet.allow_modify_others": "是否允许本 Mod 修改其它 Mod 修改的宠物背包显示样式",
+  "rows.dont_need_more_slot_reminder": "我不需要额外的槽位显示提示",
+  "rows.dont_need_more_slot_reminder.warning": "警告：开启本功能后将不再显示额外的一点点槽位范围，作者将无视并直接删除关于开启本功能后因自己遗忘了这点导致的反馈",
   "keybinding.title": "界面开关按键",
   "keybinding.current": "当前按键: {0}",
   "keybinding.press_to_set": "按下要设置的按键...",

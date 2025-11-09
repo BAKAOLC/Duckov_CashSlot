@@ -203,6 +203,19 @@ namespace Duckov_CashSlot.UI
                 GUILayout.Toggle(_tempDisplaySetting.AllowModifyOtherModPetDisplay,
                     Localization.Tr("rows.superpet.allow_modify_others"));
 
+            _tempDisplaySetting.DontNeedMoreSlotReminder =
+                GUILayout.Toggle(_tempDisplaySetting.DontNeedMoreSlotReminder,
+                    Localization.Tr("rows.dont_need_more_slot_reminder"));
+            if (_tempDisplaySetting.DontNeedMoreSlotReminder)
+                GUILayout.Label(
+                    Localization.Tr("rows.dont_need_more_slot_reminder.warning"),
+                    new GUIStyle(GUI.skin.label)
+                    {
+                        fontSize = 16,
+                        normal = { textColor = Color.red },
+                        wordWrap = true,
+                    });
+
             GUILayout.Space(20);
 
             DrawKeyCodeConfig();

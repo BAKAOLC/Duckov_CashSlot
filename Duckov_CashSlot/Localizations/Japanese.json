@@ -19,6 +19,8 @@
   "rows.pet.hint.superpet.invalid": "ヒント：SuperPet Mod がインストールされており、新しい Super Pet スタイルの適応が無効になっている場合、このオプションは効果がありません",
   "rows.superpet.compact": "新しい Super Pet スタイルの適応を有効にする",
   "rows.superpet.allow_modify_others": "この Mod が他の Mod によって変更されたペットバックパックスタイルを変更することを許可する",
+  "rows.dont_need_more_slot_reminder": "追加スロットのリマインダーは不要",
+  "rows.dont_need_more_slot_reminder.warning": "警告：この機能を有効にすると、追加のスロット範囲が表示されなくなります。この機能を有効にした後にこの点を忘れたことによるフィードバックは、作者によって無視され、直接削除されます。",
   "keybinding.title": "UI 切り替えキー",
   "keybinding.current": "現在のキー: {0}",
   "keybinding.press_to_set": "設定するキーを押してください...",

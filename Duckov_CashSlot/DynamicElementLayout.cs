@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using Duckov_CashSlot.Configs;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -164,18 +165,17 @@ namespace Duckov_CashSlot
             var pad = _gridLayoutGroup.padding;
             var totalRows = CalculateItemRows();
 
-            float preferredHeight;
-            if (totalRows > MaxRows)
-            {
-                // show a bit of the next row to indicate more content
-                preferredHeight = pad.top + pad.bottom + MaxRows * cellH + (MaxRows + 1) * spacingY;
+            var needScroll = totalRows > MaxRows;
+            var showRows = needScroll ? MaxRows : totalRows;
+            var needExtraSpace = needScroll && !SlotDisplaySetting.Instance.DontNeedMoreSlotReminder;
+
+            var preferredHeight = pad.top + pad.bottom + showRows * cellH + (showRows - 1) * spacingY;
+            if (needExtraSpace) preferredHeight += spacingY * 2; // show a bit of the next row to indicate more content
+
+            if (needScroll)
                 EnableScrollRect();
-            }
             else
-            {
-                preferredHeight = pad.top + pad.bottom + totalRows * cellH + (totalRows - 1) * spacingY;
                 DisableScrollRect();
-            }
 
             _layoutElement.minHeight = preferredHeight;
             _layoutElement.preferredHeight = preferredHeight;

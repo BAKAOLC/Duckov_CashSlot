@@ -54,6 +54,11 @@ namespace Duckov_CashSlot
                 "rows.superpet.allow_modify_others",
                 "Allow this mod to modify pet backpack style modified by other mods"
             },
+            { "rows.dont_need_more_slot_reminder", "Don't need more slot reminder" },
+            {
+                "rows.dont_need_more_slot_reminder.warning",
+                "Warning: After enabling this feature, the additional slot range will no longer be displayed. The author will ignore and directly delete feedback caused by forgetting this point after enabling this feature."
+            },
             { "keybinding.title", "UI Toggle Key" },
             { "keybinding.current", "Current Key: {0}" },
             { "keybinding.press_to_set", "Press the desired key..." },

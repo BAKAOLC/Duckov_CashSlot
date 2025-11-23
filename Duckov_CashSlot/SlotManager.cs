@@ -44,7 +44,7 @@ namespace Duckov_CashSlot
 
         public static bool IsSlotRegistered(string key)
         {
-            if (IsInitialized) return RegisteredSlots.ContainsKey(key);
+            if (IsInitialized) return !string.IsNullOrWhiteSpace(key) && RegisteredSlots.ContainsKey(key);
 
             ModLogger.LogError("SlotManager is not initialized!");
             return false;
@@ -52,6 +52,12 @@ namespace Duckov_CashSlot
 
         public static void RegisterSlot(string key, Tag[] requiredTags, Tag[] excludedTags, SlotSettings settings)
         {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                ModLogger.LogError("Cannot register slot with null or whitespace key.");
+                return;
+            }
+
             if (RegisteredSlots.TryGetValue(key, out _))
             {
                 ModLogger.LogWarning($"Slot with key '{key}' is already registered. Overwriting.");
@@ -71,6 +77,12 @@ namespace Duckov_CashSlot
 
         public static void UnregisterSlot(string key)
         {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                ModLogger.LogError("Cannot unregister slot with null or whitespace key.");
+                return;
+            }
+
             if (!RegisteredSlots.Remove(key))
             {
                 ModLogger.LogWarning($"No slot with key '{key}' found to unregister.");
@@ -104,6 +116,12 @@ namespace Duckov_CashSlot
 
         public static void AddSlotToProcessedCollections(string key)
         {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                ModLogger.LogError("Cannot add slot with null or whitespace key to processed collections.");
+                return;
+            }
+
             if (!RegisteredSlots.TryGetValue(key, out var registeredSlot))
             {
                 ModLogger.LogError($"No registered slot with key '{key}' found to add to processed collections.");
@@ -119,6 +137,12 @@ namespace Duckov_CashSlot
 
         public static void RemoveSlotFromProcessedCollections(string key)
         {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                ModLogger.LogError("Cannot remove slot with null or whitespace key from processed collections.");
+                return;
+            }
+
             foreach (var slotCollection in ProcessedSlotCollections)
             {
                 var slot = slotCollection.GetSlot(key);
@@ -173,13 +197,15 @@ namespace Duckov_CashSlot
         public static bool IsRegisteredSlot(Slot slot)
         {
             var key = slot.Key;
-            return IsInitialized && RegisteredSlots.ContainsKey(key);
+            return IsInitialized
+                   && !string.IsNullOrWhiteSpace(key)
+                   && RegisteredSlots.ContainsKey(key);
         }
 
         public static SlotSettings? GetRegisteredSlotSettings(Slot slot)
         {
             var key = slot.Key;
-            if (!IsInitialized) return null;
+            if (!IsInitialized || string.IsNullOrWhiteSpace(key)) return null;
 
             return RegisteredSlots.TryGetValue(key, out var registeredSlot)
                 ? registeredSlot.Settings
@@ -189,7 +215,7 @@ namespace Duckov_CashSlot
         public static string? GetSlotName(Slot slot)
         {
             var key = slot.Key;
-            if (!IsInitialized) return null;
+            if (!IsInitialized || string.IsNullOrWhiteSpace(key)) return null;
 
             return RegisteredSlots.TryGetValue(key, out var registeredSlot)
                 ? registeredSlot.Settings.Name
@@ -199,7 +225,7 @@ namespace Duckov_CashSlot
         public static ShowIn GetSlotShowIn(Slot slot)
         {
             var key = slot.Key;
-            if (!IsInitialized) return ShowIn.Character;
+            if (!IsInitialized || string.IsNullOrWhiteSpace(key)) return ShowIn.Character;
 
             return RegisteredSlots.TryGetValue(key, out var registeredSlot)
                 ? registeredSlot.Settings.ShowIn
@@ -209,7 +235,7 @@ namespace Duckov_CashSlot
         public static bool IsSlotForbidDeathDrop(Slot slot)
         {
             var key = slot.Key;
-            if (!IsInitialized) return false;
+            if (!IsInitialized || string.IsNullOrWhiteSpace(key)) return false;
 
             return RegisteredSlots.TryGetValue(key, out var registeredSlot)
                    && registeredSlot.Settings.ForbidDeathDrop;
@@ -218,7 +244,7 @@ namespace Duckov_CashSlot
         public static bool IsSlotForbidWeightCalculation(Slot slot)
         {
             var key = slot.Key;
-            if (!IsInitialized) return false;
+            if (!IsInitialized || string.IsNullOrWhiteSpace(key)) return false;
 
             return RegisteredSlots.TryGetValue(key, out var registeredSlot)
                    && registeredSlot.Settings.ForbidWeightCalculation;
@@ -227,7 +253,7 @@ namespace Duckov_CashSlot
         public static bool IsSlotDisableModifiers(Slot slot)
         {
             var key = slot.Key;
-            if (!IsInitialized) return false;
+            if (!IsInitialized || string.IsNullOrWhiteSpace(key)) return false;
 
             return RegisteredSlots.TryGetValue(key, out var registeredSlot)
                    && registeredSlot.Settings.DisableModifier;
@@ -318,6 +344,12 @@ namespace Duckov_CashSlot
 
         private static void CreateNewSlotToSlotCollection(SlotCollection slotCollection, RegisteredSlot registeredSlot)
         {
+            if (slotCollection == null)
+            {
+                ModLogger.LogError("SlotCollection is null! Cannot create new slot.");
+                return;
+            }
+
             var slot = new Slot(registeredSlot.Key);
             slot.requireTags.AddRange(registeredSlot.RequiredTags);
             slot.excludeTags.AddRange(registeredSlot.ExcludedTags);

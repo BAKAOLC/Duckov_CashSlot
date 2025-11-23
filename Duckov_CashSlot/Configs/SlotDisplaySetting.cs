@@ -18,8 +18,8 @@ namespace Duckov_CashSlot.Configs
         public PetSlotDisplayPosition PetSlotDisplayPosition { get; set; } = PetSlotDisplayPosition.BelowPetIcon;
         public bool NewSuperPetDisplayCompact { get; set; } // 是否启用新版本兼容性样式显示
         public bool AllowModifyOtherModPetDisplay { get; set; } // 是否允许修改其他模组的宠物物品栏显示
-        
-        public bool DontNeedMoreSlotReminder { get; set; } = false; // 不需要额外显示部分槽位提醒我还有更多槽位在界面外
+
+        public bool DontNeedMoreSlotReminder { get; set; } // 不需要额外显示部分槽位提醒我还有更多槽位在界面外
 
         public override void LoadDefault()
         {

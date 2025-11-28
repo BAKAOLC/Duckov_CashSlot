@@ -57,6 +57,7 @@
   "slot.toggle.forbid_weight_calc": "禁止重量计算",
   "slot.toggle.forbid_same_id": "禁止相同ID物品",
   "slot.toggle.disable_modifier": "禁用物品属性修正词条（比如移动速度、背包容量等）",
+  "slot.toggle.forbid_auto_plug": "禁止自动放入（拾取和双击快捷切换时不会自动放入此槽位）",
   "quantity.current_value": "当前值: {0}",
   "tags.type.required": "必需",
   "tags.type.excluded": "排除",

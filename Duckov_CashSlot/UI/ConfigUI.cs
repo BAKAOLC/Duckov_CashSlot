@@ -416,6 +416,7 @@ namespace Duckov_CashSlot.UI
                 ForbidWeightCalculation = source.ForbidWeightCalculation,
                 ForbidItemsWithSameID = source.ForbidItemsWithSameID,
                 DisableModifier = source.DisableModifier,
+                ForbidAutoPlug = source.ForbidAutoPlug,
             };
         }
 
@@ -676,6 +677,8 @@ namespace Duckov_CashSlot.UI
                 GUILayout.Toggle(slot.ForbidItemsWithSameID, Localization.Tr("slot.toggle.forbid_same_id"));
             slot.DisableModifier =
                 GUILayout.Toggle(slot.DisableModifier, Localization.Tr("slot.toggle.disable_modifier"));
+            slot.ForbidAutoPlug =
+                GUILayout.Toggle(slot.ForbidAutoPlug, Localization.Tr("slot.toggle.forbid_auto_plug"));
 
             GUILayout.FlexibleSpace();
 
@@ -694,6 +697,7 @@ namespace Duckov_CashSlot.UI
                     slot.ForbidWeightCalculation = backup.ForbidWeightCalculation;
                     slot.ForbidItemsWithSameID = backup.ForbidItemsWithSameID;
                     slot.DisableModifier = backup.DisableModifier;
+                    slot.ForbidAutoPlug = backup.ForbidAutoPlug;
                     _slotBackups.Remove(index);
                 }
 
@@ -727,6 +731,7 @@ namespace Duckov_CashSlot.UI
                 ForbidWeightCalculation = slot.Settings.ForbidWeightCalculation,
                 ForbidItemsWithSameID = slot.Settings.ForbidItemsWithSameID,
                 DisableModifier = slot.Settings.DisableModifier,
+                ForbidAutoPlug = slot.Settings.ForbidAutoPlug,
             }).ToList();
 
             RefreshPositionInputs();
@@ -747,6 +752,7 @@ namespace Duckov_CashSlot.UI
                 ForbidWeightCalculation = slot.Settings.ForbidWeightCalculation,
                 ForbidItemsWithSameID = slot.Settings.ForbidItemsWithSameID,
                 DisableModifier = slot.Settings.DisableModifier,
+                ForbidAutoPlug = slot.Settings.ForbidAutoPlug,
             }).ToList();
 
             _slotBackups.Clear();
@@ -798,7 +804,8 @@ namespace Duckov_CashSlot.UI
                         slot.ForbidDeathDrop,
                         slot.ForbidWeightCalculation,
                         slot.ForbidItemsWithSameID,
-                        slot.DisableModifier
+                        slot.DisableModifier,
+                        slot.ForbidAutoPlug
                     )
                 );
             }).ToArray();
@@ -828,6 +835,7 @@ namespace Duckov_CashSlot.UI
                 ForbidWeightCalculation = slot.Settings.ForbidWeightCalculation,
                 ForbidItemsWithSameID = slot.Settings.ForbidItemsWithSameID,
                 DisableModifier = slot.Settings.DisableModifier,
+                ForbidAutoPlug = slot.Settings.ForbidAutoPlug,
             }).ToList();
             _selectedSlotIndex = -1;
         }
@@ -846,6 +854,7 @@ namespace Duckov_CashSlot.UI
                 ForbidWeightCalculation = false,
                 ForbidItemsWithSameID = false,
                 DisableModifier = false,
+                ForbidAutoPlug = false,
             });
             _selectedSlotIndex = _tempCustomSlots.Count - 1;
             RefreshPositionInputs();
@@ -862,6 +871,7 @@ namespace Duckov_CashSlot.UI
             public bool ForbidWeightCalculation { get; set; }
             public bool ForbidItemsWithSameID { get; set; }
             public bool DisableModifier { get; set; }
+            public bool ForbidAutoPlug { get; set; }
         }
     }
 }

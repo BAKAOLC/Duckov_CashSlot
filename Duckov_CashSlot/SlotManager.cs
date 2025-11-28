@@ -259,6 +259,15 @@ namespace Duckov_CashSlot
                    && registeredSlot.Settings.DisableModifier;
         }
 
+        public static bool IsSlotForbidAutoPlug(Slot slot)
+        {
+            var key = slot.Key;
+            if (!IsInitialized || string.IsNullOrWhiteSpace(key)) return false;
+
+            return RegisteredSlots.TryGetValue(key, out var registeredSlot)
+                   && registeredSlot.Settings.ForbidAutoPlug;
+        }
+
         public static int GetSlotInventoryIndex(Slot slot)
         {
             if (!IsInitialized) return -1;

@@ -57,6 +57,7 @@
   "slot.toggle.forbid_weight_calc": "Forbid weight calculation",
   "slot.toggle.forbid_same_id": "Forbid items with same ID",
   "slot.toggle.disable_modifier": "Disable item modifier stats (e.g., move speed, backpack capacity)",
+  "slot.toggle.forbid_auto_plug": "Forbid auto-plug (items won't auto-plug on pickup or double-click)",
   "quantity.current_value": "Current: {0}",
   "tags.type.required": "Required",
   "tags.type.excluded": "Excluded",

@@ -57,6 +57,7 @@
   "slot.toggle.forbid_weight_calc": "重量計算を禁止",
   "slot.toggle.forbid_same_id": "同じIDのアイテムを禁止",
   "slot.toggle.disable_modifier": "アイテム修正ステータスを無効化（移動速度、バックパック容量など）",
+  "slot.toggle.forbid_auto_plug": "自動装着を禁止（拾得やダブルクリック時にこのスロットへ自動装着しない）",
   "quantity.current_value": "現在の値: {0}",
   "tags.type.required": "必須",
   "tags.type.excluded": "除外",
